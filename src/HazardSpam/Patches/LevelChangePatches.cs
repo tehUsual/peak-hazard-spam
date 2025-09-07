@@ -39,7 +39,7 @@ public static class LevelChangePatches
     [HarmonyPostfix]
     public static void PostfixStart(RunManager __instance)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
         if (SceneManager.GetActiveScene().name == "Airport") return;
 
         if (SceneManager.GetActiveScene().name.StartsWith("Level_"))

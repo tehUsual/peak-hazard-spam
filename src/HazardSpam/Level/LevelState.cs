@@ -30,7 +30,12 @@ public static class LevelState
 
     public static List<Biome.BiomeType> GetBiomeTypes()
     {
-        if (_mapHandlerInstance == null) return new List<Biome.BiomeType>();
+        if (_mapHandlerInstance == null) 
+        {
+            Plugin.Log.LogError("[LevelState] MapHandler is null, could not trigger GetBiomeTypes()");
+            return new List<Biome.BiomeType>();
+        }
+        Plugin.Log.LogInfo($"[LevelState] Got biome types: {string.Join(", ", _mapHandlerInstance.biomes)}");
         return _mapHandlerInstance.biomes;
     }
 

@@ -96,6 +96,10 @@ public static class LevelManager
             var (pos, rot, scaleGain) = spawner.GenerateSpawnPoints(spawnCount);
             if (pos.Length > 0)
             {
+                // Dirty, add delay for shore to ensure clients also get the props
+                if (biomeInfo.BiomeType == Biome.BiomeType.Shore)
+                    yield return new WaitForSeconds(8f);
+
                 SpawnerNetwork.Instance.SpawnPropsNetwork(spawner, pos, rot, scaleGain);
             }
 
