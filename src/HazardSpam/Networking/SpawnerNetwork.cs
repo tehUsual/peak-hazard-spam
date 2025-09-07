@@ -1,3 +1,4 @@
+using System.Collections;
 using HazardSpam.Level;
 using HazardSpam.Level.Biomes;
 using HazardSpam.Level.Spawner;
@@ -52,13 +53,13 @@ public class SpawnerNetwork : MonoBehaviourPun
             if (spawner.Area == area && spawner.SpawnType == spawnType)
             {
                 string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}"; 
-                SpawnPropsInWorld(spawner, positions, rotations, areaName);
+                StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, areaName));
                 return;
             }
         }
     }
 
-    private void SpawnPropsInWorld(SpawnerData spawnerData, Vector3[] positions, Quaternion[] rotations, string area)
+    private IEnumerator SpawnPropsInWorld(SpawnerData spawnerData, Vector3[] positions, Quaternion[] rotations, string area)
     {
         int spawns = 0;
         for (int i = 0; i < positions.Length; i++)
@@ -70,6 +71,8 @@ public class SpawnerNetwork : MonoBehaviourPun
                 spawnerData.AddSpawnInfo(positions[i], rotations[i]);
                 spawns++;
             }
+            
+            if (i % 50 == 0 && i != 0) yield return null;
         }
         Plugin.Log.LogInfo($"Spawned {spawns}/{positions.Length} '{spawnerData.Prefab.name}' in {area}");
     }
@@ -101,14 +104,13 @@ public class SpawnerNetwork : MonoBehaviourPun
             {
                 string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}";
 
-                int removed = ClearPropsInWorld(spawner, areaName);
-                Plugin.Log.LogInfo($"Cleared {removed} '{spawnType.ToString()}' from {areaName}");
+                StartCoroutine(ClearPropsInWorld(spawner, areaName));
                 return;
             }
         }
     }
     
-    private int ClearPropsInWorld(SpawnerData spawnerData, string area)
+    private IEnumerator ClearPropsInWorld(SpawnerData spawnerData, string area)
     {
         int removed = 0;
         for (int i = spawnerData.PropSpawner.transform.childCount - 1; i >= 0; i--)
@@ -119,9 +121,11 @@ public class SpawnerNetwork : MonoBehaviourPun
                 Destroy(go);
                 removed++;
             }
+            
+            if (i % 50 == 0 && i != 0) yield return null;
         }
         spawnerData.Clear();
         
-        return removed;
+        Plugin.Log.LogInfo($"Cleared {removed} '{spawnerData.SpawnType}' from {spawnerData.Area}");
     }
 }
