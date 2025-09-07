@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using HazardSpam.Config;
 using HazardSpam.Level.Biomes;
 using HazardSpam.Level.Caldera;
 using HazardSpam.Networking;
@@ -85,7 +86,7 @@ public static class LevelManager
 
         foreach (var spawner in biomeInfo.Spawners)
         {
-            int spawnCount = SpawnRates.GetSpawnRate(biomeType, spawner.Area, spawner.SpawnType);
+            int spawnCount = ConfigHandler.GetSpawnRate(biomeType, spawner.Area, spawner.SpawnType);
             if (spawnCount == 0)
             {
                 Plugin.Log.LogWarning(

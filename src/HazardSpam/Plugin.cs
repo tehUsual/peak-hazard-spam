@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using HazardSpam.Config;
 using HazardSpam.Level;
 using HazardSpam.Networking;
 using HazardSpam.Patches;
@@ -23,8 +24,6 @@ public partial class Plugin : BaseUnityPlugin
 
     private bool _isGameStarted;
 
-    public readonly bool Debug = true;
-
     private readonly TeleportHandler _teleportHandler = new TeleportHandler();
     
     // PlayerConnectionLog.AddMessage(string s)
@@ -33,6 +32,9 @@ public partial class Plugin : BaseUnityPlugin
     {
         Log = Logger;
         Log.LogInfo($"Plugin {Name} is loaded!");
+        
+        // Config
+        ConfigHandler.Init(Config);
         
         // Harmony patch
         var harmony = new Harmony("com.github.tehUsual.HazardSpam");
@@ -89,7 +91,7 @@ public partial class Plugin : BaseUnityPlugin
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (_isGameStarted && Debug)
+            if (_isGameStarted && ConfigHandler.Debug)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha7))
                 {
