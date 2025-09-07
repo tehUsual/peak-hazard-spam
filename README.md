@@ -1,8 +1,9 @@
 # HazardSpam
 
-Mass-spawns hazard for all players.
-The master generates spawns while the clients themself instantiate them.
-*Reconnection not yet supported*; Reconnecting players will not sync current spawns, but will receive new spawns.
+Mass-spawns hazard for all players.  
+*Consider this mod in BETA for now*.  
+The master generates spawns while the clients themself instantiate them.  
+*Reconnection not yet supported*; Reconnecting players will not sync current spawns, but will receive new spawns.  
 
 Supports patch **1.27.a**
 
