@@ -6,6 +6,7 @@ using HarmonyLib;
 using HazardSpam.Level;
 using HazardSpam.Networking;
 using HazardSpam.Patches;
+using HazardSpam.Util;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,6 +22,8 @@ public partial class Plugin : BaseUnityPlugin
     private const int SpawnerNetworkViewID = 9989;
 
     private bool _isGameStarted;
+
+    public readonly bool Debug = false;
 
     private readonly TeleportHandler _teleportHandler = new TeleportHandler();
     
@@ -86,7 +89,7 @@ public partial class Plugin : BaseUnityPlugin
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (_isGameStarted)
+            if (_isGameStarted && Debug)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha7))
                 {
@@ -109,17 +112,6 @@ public partial class Plugin : BaseUnityPlugin
                     _teleportHandler.WarpToTropicsCampfire();
                 if (Input.GetKeyDown(KeyCode.Keypad3))
                     _teleportHandler.WarpToAlpineMesaCampfire();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha0))
-            {
-                if (SceneManager.GetActiveScene().name == "Airport")
-                {
-                    if (LevelChangePatches.AirportCheckInKioskInstance != null)
-                    {
-                        LevelChangePatches.AirportCheckInKioskInstance.StartGame(0);
-                    }
-                }
             }
         }
     }
@@ -193,6 +185,7 @@ public partial class Plugin : BaseUnityPlugin
 
         if (scene.name == "Airport")
         {
+            StatusMessageHandler.DeInit();
             CleanupNetwork();
             StartCoroutine(DelayedInitNetwork());
             LevelManager.Reset();
