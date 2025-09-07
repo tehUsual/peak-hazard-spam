@@ -7,7 +7,7 @@ repository = "https://thunderstore.io"
 [package]
 namespace = "GoofyFungi"
 name = "HazardSpam"
-description = "Mass-spawns hazards, master & client"
+description = "Mass-spawns hazards, master & client - v2.1.0 - now with config"
 websiteUrl = "https://github.com/tehUsual/peak-hazard-spam"
 containsNsfwContent = false
 
