@@ -5,9 +5,9 @@ namespace HazardSpam;
 
 public class TeleportHandler
 {
-    private Transform? _shoreCampfire = null;
-    private Transform? _tropicsCampfire = null;
-    private Transform? _alpineMesaCampfire = null;
+    private Transform? _shoreCampfire;
+    private Transform? _tropicsCampfire;
+    private Transform? _alpineMesaCampfire;
     
     
     public void Init(List<Biome.BiomeType> currentBiomeTypes)
@@ -17,21 +17,56 @@ public class TeleportHandler
             switch (biomeType)
             {
                 case Biome.BiomeType.Shore:
-                    _shoreCampfire = GameObject.Find("Map/Biome_1/Beach/Beach_Campfire/Campfire").transform;
-                    Plugin.Log.LogInfo($"Found Shore Campfire");
+                {
+                    var go = GameObject.Find("Map/Biome_1/Beach/Beach_Campfire/Campfire");
+                    if (go != null)
+                    {
+                        _shoreCampfire = go.transform;
+                        Plugin.Log.LogInfo($"Found Shore Campfire");
+                    }
+                    else
+                        Plugin.Log.LogDebug($"Could not find Shore Campfire.");
                     break;
+                }
+                    
                 case Biome.BiomeType.Tropics:
-                    _tropicsCampfire = GameObject.Find("Map/Biome_2/Jungle/Jungle_Campfire/Campfire").transform;
-                    Plugin.Log.LogInfo($"Found Tropics Campfire");
+                {
+                    var go = GameObject.Find("Map/Biome_2/Jungle/Jungle_Campfire/Campfire");
+                    if (go != null)
+                    {
+                        _tropicsCampfire = go.transform;
+                        Plugin.Log.LogInfo($"Found Tropics Campfire");
+                    }
+                    else
+                        Plugin.Log.LogDebug($"Could not find Tropics Campfire.");
                     break;
+                }
+
                 case Biome.BiomeType.Alpine:
-                    _alpineMesaCampfire = GameObject.Find("Map/Biome_3/Snow/Snow_Campfire/Campfire").transform;
-                    Plugin.Log.LogInfo($"Found Alpine Campfire");
+                {
+                    var go = GameObject.Find("Map/Biome_3/Snow/Snow_Campfire/Campfire");
+                    if (go != null)
+                    {
+                        _alpineMesaCampfire = go.transform;
+                        Plugin.Log.LogInfo($"Found Alpine Campfire");
+                    }
+                    else
+                        Plugin.Log.LogDebug($"Could not find Alpine Campfire.");
                     break;
+                }
+
                 case Biome.BiomeType.Mesa:
-                    _alpineMesaCampfire = GameObject.Find("Map/Biome_3/Mesa/Desert_Campfire/Desert_Campfire/Campfire").transform;
-                    Plugin.Log.LogInfo($"Found Mesa Campfire");
+                {
+                    var go = GameObject.Find("Map/Biome_3/Mesa/Desert_Campfire/Snow_Campfire/Campfire");
+                    if (go != null) 
+                    {
+                        _alpineMesaCampfire = go.transform;
+                        Plugin.Log.LogInfo($"Found Mesa Campfire");
+                    }
+                    else
+                        Plugin.Log.LogDebug($"Could not find Mesa Campfire.");
                     break;
+                }
             }
         }
     }

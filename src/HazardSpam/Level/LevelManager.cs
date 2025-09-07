@@ -98,8 +98,12 @@ public static class LevelManager
             {
                 // Dirty, add delay for shore to ensure clients also get the props
                 if (biomeInfo.BiomeType == Biome.BiomeType.Shore)
-                    yield return new WaitForSeconds(8f);
+                {
+                    Plugin.Log.LogInfo($"CRUDE FIX: Delaying shore spawn for 12 seconds");   
+                    yield return new WaitForSeconds(12f);
+                }
 
+                //SpawnerNetwork.Instance.SpawnPropsNetwork(spawner, pos, rot, scaleGain);
                 SpawnerNetwork.Instance.SpawnPropsNetwork(spawner, pos, rot, scaleGain);
             }
 

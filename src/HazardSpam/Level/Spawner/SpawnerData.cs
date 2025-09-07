@@ -4,6 +4,7 @@ using HazardSpam.Spawning;
 using HazardSpam.Types;
 using Photon.Pun;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace HazardSpam.Level.Spawner;
 
@@ -71,6 +72,21 @@ public class SpawnerData
         return (positions, rotations, scaleGains);
     }
 
+    public (Vector3[] positions, Quaternion[] rotations, float[] scaleGains) GenerateSpawnPoints(int attempts, float chance,
+        float scaleGainMin, float scaleGainMax)
+    {
+        var (positions, rotations, scaleGains) = GenerateSpawnPoints(attempts);
+        for (int i = 0; i < scaleGains.Length; i++)
+        {
+            if (Random.Range(0f, 1f) < chance)
+            {
+                scaleGains[i] = Random.Range(scaleGainMin, scaleGainMax);
+            }
+        }
+        
+        return (positions, rotations, scaleGains);
+    }
+
     public (Vector3[] positions, Quaternion[] rotations, float[] scaleGains) GenerateSpawnPoints(int attempts)
     {
         if (!PhotonNetwork.IsMasterClient) return ([], [], []);
@@ -110,7 +126,7 @@ public class SpawnerData
                 failedAttempts++;
             }
         }
-        Plugin.Log.LogInfo($"Generated {spawnPosCount} spawn points, {failedAttempts} (which is fine)");
+        Plugin.Log.LogInfo($"Generated {spawnPosCount} spawn points, {failedAttempts} failed (which is fine)");
         
         return (positions.ToArray(), rotations.ToArray(), scaleGains.ToArray());
     }

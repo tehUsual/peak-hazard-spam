@@ -23,7 +23,7 @@ public partial class Plugin : BaseUnityPlugin
 
     private bool _isGameStarted;
 
-    public readonly bool Debug = false;
+    public readonly bool Debug = true;
 
     private readonly TeleportHandler _teleportHandler = new TeleportHandler();
     

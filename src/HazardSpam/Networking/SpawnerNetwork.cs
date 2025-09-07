@@ -5,6 +5,7 @@ using HazardSpam.Level.Spawner;
 using Photon.Pun;
 using HazardSpam.Spawning;
 using HazardSpam.Types;
+using HazardSpam.Util;
 using UnityEngine;
 
 namespace HazardSpam.Networking;
@@ -25,7 +26,7 @@ public class SpawnerNetwork : MonoBehaviourPun
         DontDestroyOnLoad(gameObject);
     }
     
-    public void SpawnPropsNetwork(SpawnerData spawnData, Vector3[] positions, Quaternion[] rotations, float[] scaleGain)
+    public void SpawnPropsNetwork(SpawnerData spawnData, Vector3[] positions, Quaternion[] rotations, float[] scaleGains)
     {
         if (positions.Length == 0) return;
         
@@ -53,6 +54,7 @@ public class SpawnerNetwork : MonoBehaviourPun
             if (spawner.Area == area && spawner.SpawnType == spawnType)
             {
                 string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}"; 
+                //StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, scaleGain, areaName));
                 StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, areaName));
                 return;
             }
@@ -67,6 +69,7 @@ public class SpawnerNetwork : MonoBehaviourPun
             var go = Instantiate(spawnerData.Prefab, positions[i], rotations[i], spawnerData.PropSpawner.transform);
             if (go != null)
             {
+                //go.transform.localScale *= scaleGain[i];
                 go.AddComponent<SpawnedPropHS>();
                 spawnerData.AddSpawnInfo(positions[i], rotations[i]);
                 spawns++;

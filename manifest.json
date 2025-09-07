@@ -1,6 +1,6 @@
 {
   "name": "Hazard_Spam",
-  "version_number": "1.0.1",
+  "version_number": "1.1.1",
   "website_url": "https://github.com/tehUsual/peak-hazard-spam",
   "description": "Mass-spawns hazards, master & client",
   "dependencies": []
