@@ -5,7 +5,7 @@ schemaVersion = "0.0.1"
 repository = "https://thunderstore.io"
 
 [package]
-namespace = "tehUsual"
+namespace = "GoofyFungi"
 name = "HazardSpam"
 description = "Mass-spawns hazards, master & client"
 websiteUrl = "https://github.com/tehUsual/peak-hazard-spam"
