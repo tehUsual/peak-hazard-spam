@@ -40,6 +40,7 @@ public static class LevelManager
             biomeInfo.Clear();
         }
         BiomeInfo.Clear();
+        CalderaHandler.ClearCaldera();
     }
     
     private static void GatherBiomesInfo(List<Biome.BiomeType> biomeTypes)
@@ -65,14 +66,29 @@ public static class LevelManager
                 $"Successfully gathered spawners for {biomeInfo.BiomeType.ToString()}/{biomeInfo.BiomeVariant}");
         }
     }
-    
-    
-    public static void InitBiome(Biome.BiomeType biomeType, float intervalDelay = 0.15f)
+
+    public static void InitCalderaLava()
     {
-        if (biomeType == Biome.BiomeType.Volcano)
-            CalderaHandler.InitCaldera();
-        else
-            SpawnerNetwork.Instance.StartCoroutine(InvokeInitBiome(biomeType, intervalDelay));
+        CalderaHandler.InitCaldera();
+    }
+
+    public static void InitCalderaSpawns()
+    {
+        CalderaHandler.InitSpawns();
+    }
+
+    public static void SpawnCalderaSpawns()
+    {
+        var (pos, rot, scaleGain) = CalderaHandler.GenerateSpawnPoints(500);
+        if (pos.Length > 0)
+        {
+            SpawnerNetwork.Instance.SpawnPropsNetworkCaldera(pos, rot, scaleGain);
+        }
+    }
+
+    public static void InitBiome(Biome.BiomeType biomeType, float intervalDelay = 0.15f)
+    { 
+        SpawnerNetwork.Instance.StartCoroutine(InvokeInitBiome(biomeType, intervalDelay));    
     }
 
     private static IEnumerator InvokeInitBiome(Biome.BiomeType biomeType, float intervalDelay)

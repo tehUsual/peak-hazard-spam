@@ -123,6 +123,7 @@ public partial class Plugin : BaseUnityPlugin
     private void OnBiomeLoading(Biome.BiomeType biomeType)
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        
         Log.LogInfo($"[Main] Biome loading: {biomeType}");
 
         switch (biomeType)
@@ -145,32 +146,43 @@ public partial class Plugin : BaseUnityPlugin
     {
         // Make sure everyone initializes the level manager
         if (biomeType == Biome.BiomeType.Shore)
-            LevelManager.Init(LevelState.GetBiomeTypes());
-        
-        
-        if (!PhotonNetwork.IsMasterClient) return;
-        
-        Log.LogInfo($"Biome complete: {biomeType}");
-
-        switch (biomeType)
         {
-            case Biome.BiomeType.Shore:
-                _teleportHandler.Init(LevelState.GetBiomeTypes());
-                LevelManager.InitBiome(Biome.BiomeType.Shore);
-                break;
-            case Biome.BiomeType.Tropics:
-                LevelManager.InitBiome(Biome.BiomeType.Tropics);
-                break;
-            case Biome.BiomeType.Alpine:
-                LevelManager.InitBiome(Biome.BiomeType.Alpine);
-                break;
-            case Biome.BiomeType.Mesa:
-                LevelManager.InitBiome(Biome.BiomeType.Mesa);
-                break;
-            case Biome.BiomeType.Volcano:
-                LevelManager.InitBiome(Biome.BiomeType.Volcano);
-                break;
+            LevelManager.Init(LevelState.GetBiomeTypes());
+            LevelManager.InitCalderaSpawns();
         }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Log.LogInfo($"Biome complete: {biomeType}");
+
+            switch (biomeType)
+            {
+                case Biome.BiomeType.Shore:
+                    _teleportHandler.Init(LevelState.GetBiomeTypes());
+                    LevelManager.InitBiome(Biome.BiomeType.Shore);
+                    break;
+                case Biome.BiomeType.Tropics:
+                    LevelManager.InitBiome(Biome.BiomeType.Tropics);
+                    break;
+                case Biome.BiomeType.Alpine:
+                    LevelManager.InitBiome(Biome.BiomeType.Alpine);
+                    break;
+                case Biome.BiomeType.Mesa:
+                    LevelManager.InitBiome(Biome.BiomeType.Mesa);
+                    break;
+                case Biome.BiomeType.Volcano:
+                    LevelManager.SpawnCalderaSpawns();
+                    break;
+            }
+        }
+
+        if (biomeType == Biome.BiomeType.Volcano)
+        {
+            Log.LogInfo("Initializing Caldera lava");
+            LevelManager.InitCalderaLava();            
+        }
+
+        
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

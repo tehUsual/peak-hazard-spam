@@ -1,6 +1,7 @@
 using System.Collections;
 using HazardSpam.Level;
 using HazardSpam.Level.Biomes;
+using HazardSpam.Level.Caldera;
 using HazardSpam.Level.Spawner;
 using Photon.Pun;
 using HazardSpam.Spawning;
@@ -39,26 +40,72 @@ public class SpawnerNetwork : MonoBehaviourPun
             positions, rotations
         );
     }
-    
+
+    public void SpawnPropsNetworkCaldera(Vector3[] positions, Quaternion[] rotations, float[] scaleGains)
+    {
+        if (positions.Length == 0) return;
+        Plugin.Log.LogInfo($"[Network] Sending 'RPC_SpawnProps' for {positions.Length} at {nameof(Biome.BiomeType.Volcano)}/Plateau/SlipperyJellyfish");
+        
+        photonView.RPC(
+            "RPC_SpawnProps",
+            RpcTarget.All,
+            Biome.BiomeType.Volcano, BiomeArea.Plateau, SpawnType.Jellies,
+            positions, rotations
+        );
+    }
+
     [PunRPC]
     public void RPC_SpawnProps(Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType,
         Vector3[] positions, Quaternion[] rotations)
     {
         Plugin.Log.LogInfo($"[Network] Received 'RPC_SpawnProps' for {positions.Length} at {biomeType.ToString()}/{area.ToString()}/{spawnType.ToString()}");
-        
-        BiomeInfo? biomeInfo = LevelManager.GetBiomeInfo(biomeType);
-        if (biomeInfo == null) return;
-        
-        foreach (var spawner in biomeInfo.Spawners)
+
+        if (biomeType == Biome.BiomeType.Volcano)
         {
-            if (spawner.Area == area && spawner.SpawnType == spawnType)
-            {
-                string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}"; 
-                //StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, scaleGain, areaName));
-                StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, areaName));
-                return;
-            }
+            StartCoroutine(SpawnPropsInWorldCaldera(positions, rotations));
         }
+        else
+        {
+            BiomeInfo? biomeInfo = LevelManager.GetBiomeInfo(biomeType);
+            if (biomeInfo == null) return;
+            
+            foreach (var spawner in biomeInfo.Spawners)
+            {
+                if (spawner.Area == area && spawner.SpawnType == spawnType)
+                {
+                    string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}"; 
+                    //StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, scaleGain, areaName));
+                    StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, areaName));
+                    return;
+                }
+            }    
+        }
+    }
+
+    private IEnumerator SpawnPropsInWorldCaldera(Vector3[] positions, Quaternion[] rotations)
+    {
+        Transform? spawnerTrans = CalderaHandler.GetSpawner;
+        GameObject? prefab = CalderaHandler.GetPrefab;
+
+        if (spawnerTrans == null || prefab == null)
+        {
+            Plugin.Log.LogError("Could not find Caldera spawner or prefab");
+            yield break;    
+        }
+        
+        int spawns = 0;
+        for (int i = 0; i < positions.Length; i++)
+        {
+            var go = Instantiate(prefab, positions[i], rotations[i], spawnerTrans);
+            if (go != null)
+            {
+                go.AddComponent<SpawnedPropHS>();
+                spawns++;
+            }
+            
+            if (i % 50 == 0 && i != 0) yield return null;
+        }
+        Plugin.Log.LogInfo($"Spawned {spawns}/{positions.Length} '{prefab.name}' in Caldera/Plateau");
     }
 
     private IEnumerator SpawnPropsInWorld(SpawnerData spawnerData, Vector3[] positions, Quaternion[] rotations, string area)

@@ -60,7 +60,13 @@ public static class LevelState
         if (_mapHandlerInstance != null)
         {
             Biome.BiomeType biomeType = _mapHandlerInstance.GetCurrentBiome();
-            SetBiomeLoading(biomeType);
+            Segment segment = _mapHandlerInstance.GetCurrentSegment();
+            
+            // lazy
+            if (segment == Segment.TheKiln)
+                SetBiomeLoading(Biome.BiomeType.Colony);
+            else
+                SetBiomeLoading(biomeType);
         }
         else
             Plugin.Log.LogError("[LevelState] MapHandler is null, did not trigger SetBiomeLoading()");
@@ -99,7 +105,13 @@ public static class LevelState
         if (_mapHandlerInstance != null)
         {
             Biome.BiomeType biomeType = _mapHandlerInstance.GetCurrentBiome();
-            SetBiomeComplete(biomeType);
+            Segment segment = _mapHandlerInstance.GetCurrentSegment();
+            
+            // lazy
+            if (segment == Segment.TheKiln)
+                SetBiomeComplete(Biome.BiomeType.Colony);
+            else
+                SetBiomeComplete(biomeType);
         }
         else
             Plugin.Log.LogError("[LevelState] MapHandler is null, did not trigger SetBiomeComplete()");

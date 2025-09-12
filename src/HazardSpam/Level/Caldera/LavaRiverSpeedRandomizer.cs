@@ -1,92 +1,54 @@
-using Photon.Pun;
 using UnityEngine;
 
 namespace HazardSpam.Level.Caldera;
 
-public class LavaRiverSpeedRandomizer : MonoBehaviour
+public class LavaRiverSpeedRandomizer
 {
-    private readonly float _minSpeed = 1f;
-    private readonly float _maxSpeed = 5f;
-    private readonly float _randomChangeIntervalMin = 10f;
-    private readonly float _randomChangeIntervalMax = 15f;
-    private readonly float _spikeIntervalMin = 120f;
-    private readonly float _spikeIntervalMax = 150f;
-    private readonly float _spikeDuration = 6f;
-
     private float _timer;
     private float _nextRandomChange;
     private float _nextSpikeTime;
-    private float _currentSpeed = 1f;
-    private bool _isSpike;
-    private float _spikeEndTime;
 
-    private Animator? _animator;
+    private readonly float _randomChangeInterval = 10f;
+    private readonly float _spikeInterval = 120f;
+    private readonly float _spikeDurationMin = 8f;
+    private readonly float _spikeDurationMax = 12f;
+    private readonly float _minSpeed = 1f;
+    private readonly float _maxSpeed = 5f;
+    private readonly float _minSpikeSpeed = 25f;
+    private readonly float _maxSpikeSpeed = 30f;
 
-    private void Awake()
+    public LavaRiverSpeedRandomizer()
     {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            enabled = false;
-            return;
-        }
-        
-        _animator = GetComponent<Animator>();
-        if (_animator == null)
-        {
-            Debug.LogError("LavaRiverSpeedRandomizer: No animator found!");
-            enabled = false;
-        }
+        _timer = 0f;
+        _nextRandomChange = _randomChangeInterval;
+        _nextSpikeTime = _spikeInterval;
     }
-
-    private void Update()
+    
+    public (bool, float) Poll(float deltaTime)
     {
-        var (changed, newSpeed) = GetNextSpeed();
-        if (changed && _animator != null)
-            _animator.speed = newSpeed;
-    }
+        _timer += deltaTime;
 
-
-    private (bool, float) GetNextSpeed()
-    {
-        _timer += Time.deltaTime;
-
-        // Initialize first timings
-        if (_nextRandomChange == 0f)
-            _nextRandomChange = _timer + Random.Range(_randomChangeIntervalMin, _randomChangeIntervalMax);
-        if (_nextSpikeTime == 0f)
-            _nextSpikeTime = _timer + Random.Range(_spikeIntervalMin, _spikeIntervalMax);
-
-        // Handle spike
-        if (_isSpike)
-        {
-            if (_timer >= _spikeEndTime)
-            {
-                _isSpike = false;
-                // schedule next random change shortly after spike ends
-                _nextRandomChange = _timer + Random.Range(_randomChangeIntervalMin, _randomChangeIntervalMax);
-                _currentSpeed = Random.Range(_minSpeed, _maxSpeed);
-                return (true, _currentSpeed); // spike ended, speed changed
-            }
-            return (false, 25f); // spike ongoing, speed is constant, no change
-        }
-
-        // Trigger spike
+        // Spike check
         if (_timer >= _nextSpikeTime)
         {
-            _isSpike = true;
-            _spikeEndTime = _timer + _spikeDuration;
-            _nextSpikeTime = _timer + Random.Range(_spikeIntervalMin, _spikeIntervalMax); // schedule next spike
-            return (true, 25f); // new spike, speed changed
+            float spikeTime = Random.Range(_spikeDurationMin, _spikeDurationMax);
+            float newSpeed = Random.Range(_minSpikeSpeed, _maxSpikeSpeed);
+            
+            // schedule next spike and random change
+            _nextSpikeTime += _spikeInterval + spikeTime;
+            _nextRandomChange = _timer + spikeTime;
+            
+            return (true, newSpeed);
         }
 
-        // Handle random speed change (only if not spiking)
+        // Regular random speed
         if (_timer >= _nextRandomChange)
         {
-            _currentSpeed = Random.Range(_minSpeed, _maxSpeed);
-            _nextRandomChange = _timer + Random.Range(_randomChangeIntervalMin, _randomChangeIntervalMax);
-            return (true, _currentSpeed); // speed changed
+            _nextRandomChange += _randomChangeInterval;
+            float newSpeed = Random.Range(_minSpeed, _maxSpeed);
+            return (true, newSpeed);
         }
 
-        return (false, _currentSpeed); // no change
+        return (false, 0f);
     }
 }
