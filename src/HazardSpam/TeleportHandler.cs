@@ -58,7 +58,7 @@ public class TeleportHandler
 
                 case Biome.BiomeType.Mesa:
                 {
-                    var go = GameObject.Find("Map/Biome_3/Mesa/Desert_Campfire/Snow_Campfire/Campfire");
+                    var go = GameObject.Find("Map/Biome_3/Desert/Desert_Campfire/Snow_Campfire/Campfire");
                     if (go != null) 
                     {
                         _alpineMesaCampfire = go.transform;
