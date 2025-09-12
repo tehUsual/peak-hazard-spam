@@ -9,7 +9,12 @@ public static class ConfigHandler
 {
     // Debug
     private static ConfigEntry<bool> _configDebug = null!;
-    public static bool Debug => _configDebug.Value;
+    // Caldera eruptions
+    private static ConfigEntry<float> _configCalderaEruptSpawnMinTime = null!;
+    private static ConfigEntry<float> _configCalderaEruptSpawnMaxTime = null!;
+    internal static bool Debug => _configDebug.Value;
+    internal static float CalderaEruptSpawnMinTime => _configCalderaEruptSpawnMinTime.Value;
+    internal static float CalderaEruptSpawnMaxTime => _configCalderaEruptSpawnMaxTime.Value;
     
     // SpawnRates
     private static readonly Dictionary<(Biome.BiomeType, BiomeArea, SpawnType), ConfigEntry<int>> SpawnRatesDict = [];
@@ -17,6 +22,10 @@ public static class ConfigHandler
     public static void Init(ConfigFile config)
     {
         _configDebug = config.Bind("Debug", "Debug", false, "Enabled debug logging and utils");
+        
+        // Caldera eruptions
+        _configCalderaEruptSpawnMinTime = config.Bind("CalderaEruption", "SpawnMinTime", -5f, "Minimum time between erupts");
+        _configCalderaEruptSpawnMaxTime = config.Bind("CalderaEruption", "SpawnMaxTime", 15f, "Maximum time between erupts");
         
         InitSpawnRates(config);
     }

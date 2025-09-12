@@ -103,8 +103,7 @@ public static class LevelManager
                     Plugin.Log.LogInfo($"CRUDE FIX: Delaying shore spawn for 12 seconds");   
                     yield return new WaitForSeconds(12f);
                 }
-
-                //SpawnerNetwork.Instance.SpawnPropsNetwork(spawner, pos, rot, scaleGain);
+                
                 SpawnerNetwork.Instance.SpawnPropsNetwork(spawner, pos, rot, scaleGain);
             }
 

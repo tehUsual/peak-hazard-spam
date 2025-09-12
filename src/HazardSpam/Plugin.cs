@@ -185,7 +185,7 @@ public partial class Plugin : BaseUnityPlugin
             _isGameStarted = true;
         }
 
-        if (scene.name == "Airport")
+        if (scene.name == "Airport" || scene.name.ToLower().StartsWith("airp"))
         {
             StatusMessageHandler.DeInit();
             CleanupNetwork();

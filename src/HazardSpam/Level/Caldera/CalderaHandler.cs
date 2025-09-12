@@ -18,7 +18,6 @@ public static class CalderaHandler
         if (comp == null)
         {
             Plugin.Log.LogError($"Could not add LavaRiverSpeedRandomizer to LavaRiver");
-            return;
         }
     }
 }
