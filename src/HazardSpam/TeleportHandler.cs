@@ -8,6 +8,7 @@ public class TeleportHandler
     private Transform? _shoreCampfire;
     private Transform? _tropicsCampfire;
     private Transform? _alpineMesaCampfire;
+    private Transform? _calderaCampfire;
     
     
     public void Init(List<Biome.BiomeType> currentBiomeTypes)
@@ -67,25 +68,68 @@ public class TeleportHandler
                         Plugin.Log.LogDebug($"Could not find Mesa Campfire.");
                     break;
                 }
+
+                case Biome.BiomeType.Volcano:
+                {
+                    var go = GameObject.Find("Map/Biome_4/Volcano/Volcano_Campfire/Campfire");
+                    if (go != null)
+                    {
+                        _calderaCampfire = go.transform;
+                        Plugin.Log.LogInfo($"Found Volcano Campfire");
+                    }
+                    else
+                        Plugin.Log.LogDebug($"Could not find Volcano Campfire.");
+                    break;
+                }
             }
         }
     }
 
-    public void WarpToShoreCampfire()
+    public void WarpToShoreCampfire(bool all = true)
     {
-        if (_shoreCampfire == null) return;
-        Player.localPlayer.character.WarpPlayer(_shoreCampfire.position, false);
+        if (_shoreCampfire == null)
+            return;
+
+        foreach (var character in Character.AllCharacters)
+        {
+            if (all || (!all && character == Character.localCharacter))
+                character.WarpPlayer(_shoreCampfire.position, false);
+        }
     }
 
-    public void WarpToTropicsCampfire()
+    public void WarpToTropicsCampfire(bool all = true)
     {
-        if (_tropicsCampfire == null) return;
-        Player.localPlayer.character.WarpPlayer(_tropicsCampfire.position, false);
+        if (_tropicsCampfire == null)
+            return;
+        
+        foreach (var character in Character.AllCharacters)
+        {
+            if (all || (!all && character == Character.localCharacter))
+                character.WarpPlayer(_tropicsCampfire.position, false);
+        }
     }
     
-    public void WarpToAlpineMesaCampfire()
+    public void WarpToAlpineMesaCampfire(bool all = true)
     {
-        if (_alpineMesaCampfire == null) return;
-        Player.localPlayer.character.WarpPlayer(_alpineMesaCampfire.position, false);
+        if (_alpineMesaCampfire == null)
+            return;
+        
+        foreach (var character in Character.AllCharacters)
+        {
+            if (all || (!all && character == Character.localCharacter))
+                character.WarpPlayer(_alpineMesaCampfire.position, false);
+        }
+    }
+    
+    public void WarpToCalderaCampfire(bool all = true)
+    {
+        if (_calderaCampfire == null)
+            return;
+        
+        foreach (var character in Character.AllCharacters)
+        {
+            if (all || (!all && character == Character.localCharacter))
+                character.WarpPlayer(_calderaCampfire.position, false);
+        }
     }
 }

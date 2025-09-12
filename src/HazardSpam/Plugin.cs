@@ -114,6 +114,8 @@ public partial class Plugin : BaseUnityPlugin
                     _teleportHandler.WarpToTropicsCampfire();
                 if (Input.GetKeyDown(KeyCode.Keypad3))
                     _teleportHandler.WarpToAlpineMesaCampfire();
+                if (Input.GetKeyDown(KeyCode.Keypad4))
+                    _teleportHandler.WarpToCalderaCampfire();
             }
         }
     }
