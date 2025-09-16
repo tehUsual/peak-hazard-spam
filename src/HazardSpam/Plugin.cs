@@ -176,11 +176,11 @@ public partial class Plugin : BaseUnityPlugin
             }
         }
 
-        if (biomeType == Biome.BiomeType.Volcano)
-        {
-            Log.LogInfo("Initializing Caldera lava");
-            LevelManager.InitCalderaLava();            
-        }
+        //if (biomeType == Biome.BiomeType.Volcano)
+       // {
+        //    Log.LogInfo("Initializing Caldera lava");
+         //   LevelManager.InitCalderaLava();            
+        //}
 
         
     }

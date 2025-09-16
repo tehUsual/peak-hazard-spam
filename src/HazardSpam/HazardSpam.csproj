@@ -8,8 +8,14 @@
     <!-- This is the display name of your mod. Example: BepInEx Template -->
     <AssemblyTitle>HazardSpam</AssemblyTitle>
     <!-- This is the version number of your mod. -->
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\NetGameState\src\NetGameState\NetGameState.csproj">
+      <Link>NetGameState.csproj</Link>
+    </Content>
+  </ItemGroup>
 
   <!--
   How to include thunderstore mods as dependencies via nuget

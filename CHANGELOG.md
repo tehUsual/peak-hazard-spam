@@ -1,4 +1,14 @@
 # Changelog
+**1.3.0**
+- Feature: Added jelly spawn to caldera.
+- Change: Caldera, set fire spawn rate to default. Can be changed in config.
+- Change: Changed default spawn rate for mesa.
+- Remove: Temporarily removed lava pool random speed due to desync.
+- Fix: Reduced lag in caldera (due to increased fire spawn).
+
+**1.2.0**
+- Feature: Added a config file. Set custom spawn rates.
+
 **1.1.1**
 - Fixed: Plugin stopped working if mesa was selected.
 

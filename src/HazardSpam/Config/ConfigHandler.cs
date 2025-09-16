@@ -51,16 +51,16 @@ public static class ConfigHandler
         BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallRight, SpawnType.Geysers, 150);
         BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallRight, SpawnType.FlashPlant, 150);
 
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.Plateau, SpawnType.Geysers, 250);
+        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.Plateau, SpawnType.Geysers, 200);
 
         // Mesa
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Plateau, SpawnType.CactusBalls, 500);
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Plateau, SpawnType.Tumblers, 5);
+        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Plateau, SpawnType.CactusBalls, 1500);
+        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Plateau, SpawnType.Tumblers, 3);
 
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.CactusBalls, 750);
+        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.CactusBalls, 1500);
         BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.Dynamite, 200);
         BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.DynamiteOutside, 200);
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.Scorpions, 10);
+        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.Scorpions, 5);
     }
 
     private static void BindSpawnRates(ConfigFile config, Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType, int defaultValue)

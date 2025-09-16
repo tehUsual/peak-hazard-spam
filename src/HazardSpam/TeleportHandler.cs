@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 namespace HazardSpam;
@@ -85,51 +86,47 @@ public class TeleportHandler
         }
     }
 
-    public void WarpToShoreCampfire(bool all = true)
+    public void WarpToShoreCampfire()
     {
         if (_shoreCampfire == null)
             return;
 
-        foreach (var character in Character.AllCharacters)
+        foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
-            if (all || (!all && character == Character.localCharacter))
-                character.WarpPlayer(_shoreCampfire.position, false);
+            character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _shoreCampfire.position, false);
         }
     }
 
-    public void WarpToTropicsCampfire(bool all = true)
+    public void WarpToTropicsCampfire()
     {
         if (_tropicsCampfire == null)
             return;
         
-        foreach (var character in Character.AllCharacters)
+        foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
-            if (all || (!all && character == Character.localCharacter))
-                character.WarpPlayer(_tropicsCampfire.position, false);
+            character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _tropicsCampfire.position, false);
         }
     }
     
-    public void WarpToAlpineMesaCampfire(bool all = true)
+    public void WarpToAlpineMesaCampfire()
     {
         if (_alpineMesaCampfire == null)
             return;
         
-        foreach (var character in Character.AllCharacters)
+        foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
-            if (all || (!all && character == Character.localCharacter))
-                character.WarpPlayer(_alpineMesaCampfire.position, false);
+            character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _alpineMesaCampfire.position, false);
         }
     }
     
-    public void WarpToCalderaCampfire(bool all = true)
+    public void WarpToCalderaCampfire()
     {
         if (_calderaCampfire == null)
             return;
         
-        foreach (var character in Character.AllCharacters)
+        foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
-            if (all || (!all && character == Character.localCharacter))
-                character.WarpPlayer(_calderaCampfire.position, false);
+            character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _calderaCampfire.position, false);
         }
     }
 }

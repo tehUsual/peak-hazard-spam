@@ -7,6 +7,7 @@ public class LavaRiverSpeedHandler : MonoBehaviourPun
 {
     private Animator _animator = null!;
     private LavaRiverSpeedRandomizer _randomizer = null!;
+    private PhotonView _view = null!;
 
     private float _targetSpeed;
     private float _applyTime;
@@ -24,6 +25,11 @@ public class LavaRiverSpeedHandler : MonoBehaviourPun
         _randomizer = new LavaRiverSpeedRandomizer();
     }
 
+    private void Start()
+    {
+        _view = GetComponent<PhotonView>();
+    }
+
     private void Update()
     {
         // Master polls randomizer
@@ -34,7 +40,8 @@ public class LavaRiverSpeedHandler : MonoBehaviourPun
             {
                 // Schedule 2 seconds into the future (network time)
                 double applyAt = PhotonNetwork.Time + 2.0;
-                photonView.RPC("RPC_SetLavaSpeed", RpcTarget.AllBuffered, newSpeed, applyAt);
+                float applyAtF = (float)applyAt;
+                _view.RPC("RPC_SetLavaSpeed", RpcTarget.AllBuffered, newSpeed, applyAtF);
             }
         }
 
@@ -47,12 +54,12 @@ public class LavaRiverSpeedHandler : MonoBehaviourPun
     }
 
     [PunRPC]
-    private void RPC_SetLavaSpeed(float speed, double applyAt)
+    public void RPC_SetLavaSpeed(float speed, float applyAt)
     {
         _targetSpeed = speed;
 
         // Convert network time to local Time.time
-        _applyTime = (float)(applyAt - PhotonNetwork.Time + Time.time);
+        _applyTime = applyAt - (float)PhotonNetwork.Time + Time.time;
 
         Plugin.Log.LogInfo($"LavaRiverSpeedHandler: New speed {speed} scheduled to apply at {applyAt} network time ({_applyTime} local Time.time)");
     }
