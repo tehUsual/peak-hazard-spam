@@ -11,10 +11,26 @@
     <Version>1.3.0</Version>
   </PropertyGroup>
 
+<!--
   <ItemGroup>
-    <Content Include="..\..\..\NetGameState\src\NetGameState\NetGameState.csproj">
-      <Link>NetGameState.csproj</Link>
-    </Content>
+    <Compile Include="..\..\..\ConsoleTools\src\ConsoleTools\**\*.cs">
+      <Link>ConsoleTools\%(RecursiveDir:ConsoleTools\)%(Filename)%(Extension)</Link>
+    </Compile>
+    <None Remove="..\..\..\ConsoleTools\src\ConsoleTools\**\*.*" />
+  </ItemGroup>
+-->
+  
+<!--
+  <ItemGroup>
+    <Compile Include="..\..\..\NetGameState\src\NetGameState\**\*.cs">
+	  <Link>ConsoleTools\%(RecursiveDir:ConsoleTools\)%(Filename)%(Extension)</Link>
+	</Compile>
+	<None Remove="..\..\..\NetGameState\src\NetGameState\**\*.*" />
+  </ItemGroup>
+-->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\NetGameState\src\NetGameState\NetGameState.csproj" />
   </ItemGroup>
 
   <!--

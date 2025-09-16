@@ -1,13 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Logging;
+using ConsoleTools;
+using ConsoleTools.Patches;
 using HarmonyLib;
 using HazardSpam.Config;
 using HazardSpam.Level;
 using HazardSpam.Networking;
 using HazardSpam.Patches;
 using HazardSpam.Util;
+using NetGameState.Events;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,6 +25,8 @@ public partial class Plugin : BaseUnityPlugin
     internal static ManualLogSource Log { get; private set; } = null!;
     
     private const int SpawnerNetworkViewID = 9989;
+    
+    private const string CompatibleVersion = "1.29.a";
 
     private bool _isGameStarted;
 
@@ -33,13 +39,30 @@ public partial class Plugin : BaseUnityPlugin
         Log = Logger;
         Log.LogInfo($"Plugin {Name} is loaded!");
         
-        // Config
+        // === Config
         ConfigHandler.Init(Config);
         
-        // Harmony patch
+        // === Configure console
+        ConsoleConfig.Register(Name);
+        ConsoleConfig.SetLogging(Name, true);
+        ConsoleConfig.ShowUnityLogs = false;
+        ConsoleConfig.SetDefaultSourceColor(ConsoleColor.DarkCyan);
+        ConsoleConfig.SetDefaultCallerColor(ConsoleColor.DarkYellow);    
+        
+        // === Harmony patch
         var harmony = new Harmony("com.github.tehUsual.HazardSpam");
+        harmony.PatchAll(typeof(ConsoleLogListenerPatches));
         harmony.PatchAll(typeof(LevelChangePatches));
         harmony.PatchAll(typeof(EruptionSpawnerPatches));
+        
+        // === Version check
+        if (Application.version.Trim('.') != CompatibleVersion)
+            Log.LogColorW($"This plugin is only compatible with v{CompatibleVersion}. The library may not work correctly."
+                                      + $" Current game version: v{Application.version}");
+        
+        // === Callbacks
+        GameStateEvents.OnRunStartLoading += OnRunStartLoading;
+        GameStateEvents.OnRunStartLoadComplete += OnRunStartLoadComplete;
         
         // network helper
         //InitNetwork();
@@ -48,8 +71,24 @@ public partial class Plugin : BaseUnityPlugin
         SceneManager.sceneLoaded += OnSceneLoaded;
         LevelState.OnBiomeLoading += OnBiomeLoading;
         LevelState.OnBiomeComplete += OnBiomeComplete;
+        
+        //ConsoleConfig.Register(Name);
+        //ConsoleConfig.SetDefaultSourceColor(ConsoleColor.DarkMagenta);
+        //ConsoleConfig.SetDefaultSourceColor(ConsoleColor.DarkCyan);
     }
-    
+
+    private void OnRunStartLoading(string sceneName, int ascent)
+    {
+        //Log.LogInfo("RUN START IS LOADING");
+        Log.LogColor("RUN START IS LOADING");
+    }
+
+    private void OnRunStartLoadComplete(string sceneName, int ascent)
+    {
+        //Log.LogInfo("RUN START LOAD COMPLETE");
+        Log.LogColor("RUN START LOAD COMPLETE");
+    }
+
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
