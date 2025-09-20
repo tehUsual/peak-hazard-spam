@@ -1,7 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 
-namespace HazardSpam.Level.Caldera;
+namespace HazardSpam.Caldera;
 
 public class LavaRiverSpeedHandler : MonoBehaviourPun
 {

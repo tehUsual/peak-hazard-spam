@@ -22,9 +22,7 @@ public static class EruptionSpawnerPatches
         __instance.counter -= Time.deltaTime;
         if (__instance.counter < 0f)
         {
-            __instance.counter = Random.Range(
-                ConfigHandler.CalderaEruptSpawnMinTime,
-                ConfigHandler.CalderaEruptSpawnMaxTime);
+            __instance.counter = Random.Range( -5, 15);
 
             Vector3 spawnPos = __instance.transform.position;
             spawnPos.x += Random.Range(-155f, 155f);

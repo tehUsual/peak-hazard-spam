@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace HazardSpam.Level.Caldera;
+namespace HazardSpam.Caldera;
 
 public class LavaRiverSpeedRandomizer
 {

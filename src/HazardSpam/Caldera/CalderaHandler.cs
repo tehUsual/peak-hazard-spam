@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-namespace HazardSpam.Level.Caldera;
+namespace HazardSpam.Caldera;
 
 public static class CalderaHandler
 {

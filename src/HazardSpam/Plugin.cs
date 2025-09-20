@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections;
-using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Logging;
 using ConsoleTools;
 using ConsoleTools.Patches;
 using HarmonyLib;
 using HazardSpam.Config;
-using HazardSpam.Level;
+using HazardSpam.LevelStructure;
 using HazardSpam.Networking;
-using HazardSpam.Patches;
-using HazardSpam.Util;
 using NetGameState.Events;
+using NetGameState.Level;
+using NetGameState.LevelProgression;
+using NetGameState.Util;
 using Photon.Pun;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace HazardSpam;
 
@@ -28,9 +27,7 @@ public partial class Plugin : BaseUnityPlugin
     
     private const string CompatibleVersion = "1.29.a";
 
-    private bool _isGameStarted;
-
-    private readonly TeleportHandler _teleportHandler = new TeleportHandler();
+    internal bool SpawnersInitialized = false;
     
     // PlayerConnectionLog.AddMessage(string s)
     // PlayerConnectionLog.OnPlayerEnteredRoom(player)
@@ -52,8 +49,6 @@ public partial class Plugin : BaseUnityPlugin
         // === Harmony patch
         var harmony = new Harmony("com.github.tehUsual.HazardSpam");
         harmony.PatchAll(typeof(ConsoleLogListenerPatches));
-        harmony.PatchAll(typeof(LevelChangePatches));
-        harmony.PatchAll(typeof(EruptionSpawnerPatches));
         
         // === Version check
         if (Application.version.Trim('.') != CompatibleVersion)
@@ -63,35 +58,135 @@ public partial class Plugin : BaseUnityPlugin
         // === Callbacks
         GameStateEvents.OnRunStartLoading += OnRunStartLoading;
         GameStateEvents.OnRunStartLoadComplete += OnRunStartLoadComplete;
+        GameStateEvents.OnAllPlayersReady += OnAllPlayersReady;
+        GameStateEvents.OnPlayerLoadTimeout += OnPlayerLoadTimeout;
+
+        SegmentManager.OnSegmentLoading += OnSegmentLoading;
+        SegmentManager.OnSegmentLoadComplete += OnSegmentLoadComplete;
         
-        // network helper
-        //InitNetwork();
+        GameStateEvents.OnAirportLoaded += OnAirportLoaded;
+        GameStateEvents.OnSelfLeaveLobby += OnSelfLeaveLobby;
         
-        // Callbacks
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        LevelState.OnBiomeLoading += OnBiomeLoading;
-        LevelState.OnBiomeComplete += OnBiomeComplete;
-        
-        //ConsoleConfig.Register(Name);
-        //ConsoleConfig.SetDefaultSourceColor(ConsoleColor.DarkMagenta);
-        //ConsoleConfig.SetDefaultSourceColor(ConsoleColor.DarkCyan);
+        InitNetwork();
     }
 
     private void OnRunStartLoading(string sceneName, int ascent)
     {
-        //Log.LogInfo("RUN START IS LOADING");
-        Log.LogColor("RUN START IS LOADING");
     }
 
     private void OnRunStartLoadComplete(string sceneName, int ascent)
     {
-        //Log.LogInfo("RUN START LOAD COMPLETE");
-        Log.LogColor("RUN START LOAD COMPLETE");
+        InitializeSpawners();
+    }
+
+    private void InitializeSpawners()
+    {
+        SpawnerNetwork.Instance.StartCoroutine(InitializeSpawnersRoutine());
+    }
+
+    private IEnumerator InitializeSpawnersRoutine()
+    {
+        CleanupSpawners();
+        SubZone tropicsZone = SegmentManager.CurrentRunSubZones.TryGetValue(Zone.Tropics, out var value) ? value : SubZone.Unknown;
+        SubZone alpineZone = SegmentManager.CurrentRunSubZones.TryGetValue(Zone.Alpine, out value) ? value : SubZone.Unknown;
+        
+        
+        yield return SpawnerRegistry.InitializeSpawnersRoutine((TropicsZone)tropicsZone, (AlpineZone)alpineZone, SegmentManager.IsAlpine);
+        yield return SpawnerRegistry.LoadSpawnersRoutine(SegmentManager.CurrentRunSubZones);
+        
+        SpawnersInitialized = true;
+    }
+
+    private void OnAllPlayersReady()
+    {
+        LoadZone(Zone.Shore);
+    }
+    
+    private void OnPlayerLoadTimeout(Player player)
+    {
+        Log.LogColorW($"Player {player.photonView.Owner.NickName} did not load");
+        LoadZone(SegmentManager.CurrentZone);
+    }
+
+    private void OnSegmentLoadComplete(SegmentManager.SegmentInfo segment)
+    {
+        if (segment.Zone == Zone.Shore)
+            return;
+        
+        LoadZone(segment.Zone);
+    }
+
+    private void LoadZone(Zone zone)
+    {
+        Log.LogColor($"Loading zone {zone}");
+        SpawnerNetwork.Instance.StartCoroutine(LoadZoneRoutine(zone));
+    }
+
+    private IEnumerator LoadZoneRoutine(Zone zone)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            yield break;
+        
+        float timeout = 20f;
+        float elapsed = 0f;
+        
+        while (!SpawnersInitialized || !GameStateEvents.IsRunActive)
+        {
+            yield return new WaitForSeconds(0.1f);
+            elapsed += 0.1f;
+            
+            if (elapsed >= timeout)
+                break;
+        }
+
+        if (!SpawnersInitialized)
+        {
+            Log.LogColorW($"Timed out waiting for spawners to load");
+            yield break;
+        }
+        
+        yield return SpawnerRegistry.LoadZoneRoutine(zone);
+    }
+
+    private void OnSegmentLoading(SegmentManager.SegmentInfo fromSegment, SegmentManager.SegmentInfo toSegment)
+    {
+        // TODO: 
+        Log.LogColor($"Segment loading: {fromSegment.Zone} -> {toSegment.Zone}");
+        
+        if (fromSegment.Zone == Zone.Unknown)
+            return;
+        
+        Log.LogColor($"Unloading zone {fromSegment.Zone}");
+        SpawnerNetwork.Instance.StartCoroutine(SpawnerRegistry.UnloadZoneRoutine(fromSegment.Zone));
+    }
+
+    private void OnAirportLoaded()
+    {
+        Log.LogColor("Loaded airport, cleaning spawners");
+        CleanupSpawners();
+    }
+
+    private void OnSelfLeaveLobby()
+    {
+        Log.LogColor("Left lobby, cleaning spawners");
+        CleanupSpawners();
+    }
+
+    private void CleanupSpawners()
+    {
+        SpawnerRegistry.CleanupSpawners();
+        SpawnersInitialized = false;
     }
 
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        GameStateEvents.OnRunStartLoading -= OnRunStartLoading;
+        GameStateEvents.OnRunStartLoadComplete -= OnRunStartLoadComplete;
+        GameStateEvents.OnAllPlayersReady -= OnAllPlayersReady;
+        GameStateEvents.OnPlayerLoadTimeout -= OnPlayerLoadTimeout;
+        
+        GameStateEvents.OnAirportLoaded -= OnAirportLoaded;
+        GameStateEvents.OnSelfLeaveLobby -= OnSelfLeaveLobby;
     }
     
 
@@ -104,17 +199,10 @@ public partial class Plugin : BaseUnityPlugin
         }
 
         var go = new GameObject("HS_SpawnerNetwork");
-        DontDestroyOnLoad(go);
         go.AddComponent<PhotonView>();
         var pv = go.GetComponent<PhotonView>();
         pv.ViewID = SpawnerNetworkViewID;
         go.AddComponent<SpawnerNetwork>();
-    }
-
-    private IEnumerator DelayedInitNetwork()
-    {
-        yield return new WaitForSeconds(0.5f);
-        InitNetwork();
     }
 
     private void CleanupNetwork()
@@ -128,122 +216,40 @@ public partial class Plugin : BaseUnityPlugin
 
     private void Update()
     {
-        if (PhotonNetwork.IsMasterClient)
+        // Toggle unity console
+        if (Input.GetKeyDown(KeyCode.F5))
         {
-            if (_isGameStarted && ConfigHandler.Debug)
+            ConsoleConfig.ShowUnityLogs = !ConsoleConfig.ShowUnityLogs;
+            Log.LogColor($"Unity console logs {(ConsoleConfig.ShowUnityLogs ? "enabled" : "disabled")}");
+        }
+        
+        // Master only
+        if (PhotonNetwork.IsMasterClient && GameStateEvents.IsRunActive)
+        {
+            if (Input.GetKeyDown(KeyCode.Keypad1))
+                TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.Shore);
+            if (Input.GetKeyDown(KeyCode.Keypad2))
+                TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.Tropics);
+            if (Input.GetKeyDown(KeyCode.Keypad3))
+                TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.AlpineMesa);
+            if (Input.GetKeyDown(KeyCode.Keypad4))
+                TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.Caldera);
+            if (Input.GetKeyDown(KeyCode.Keypad5))
+                TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.PeakFlagpole);
+            
+            // Quick start
+            if (Input.GetKeyDown(KeyCode.Keypad9))
             {
-                if (Input.GetKeyDown(KeyCode.Alpha7))
+                Log.LogColor($"In airport: {GameStateEvents.IsInAirport}");
+                if (GameStateEvents.IsInAirport)
                 {
-                    Player.localPlayer.character.refs.balloons.TieNewBalloon(0);
+                    var go = GameObject.Find("Map/BL_Airport/Fences/Check In desk/AirportGateKiosk");
+                    Log.LogColor($"GateKiosk is null: {go == null}");
+                    var kiosk = go?.GetComponent<AirportCheckInKiosk>();
+                    Log.LogColor($"GateKiosk(script) is null: {kiosk == null}");
+                    kiosk?.LoadIslandMaster(0);    
                 }
-
-                if (Input.GetKeyDown(KeyCode.Alpha8))
-                {
-                    if (Player.localPlayer.character.refs.balloons.tiedBalloons.Count > 0)
-                    {
-                        var balloon = Player.localPlayer.character.refs.balloons.tiedBalloons[0];
-                        Player.localPlayer.character.refs.balloons.RemoveBalloon(balloon);
-                    }
-                }
-                
-                // Teleports
-                if (Input.GetKeyDown(KeyCode.Keypad1))
-                    _teleportHandler.WarpToShoreCampfire();
-                if (Input.GetKeyDown(KeyCode.Keypad2))
-                    _teleportHandler.WarpToTropicsCampfire();
-                if (Input.GetKeyDown(KeyCode.Keypad3))
-                    _teleportHandler.WarpToAlpineMesaCampfire();
-                if (Input.GetKeyDown(KeyCode.Keypad4))
-                    _teleportHandler.WarpToCalderaCampfire();
             }
-        }
-    }
-
-    private void OnBiomeLoading(Biome.BiomeType biomeType)
-    {
-        if (!PhotonNetwork.IsMasterClient) return;
-        
-        Log.LogInfo($"[Main] Biome loading: {biomeType}");
-
-        switch (biomeType)
-        {
-            case Biome.BiomeType.Tropics:
-                LevelManager.ClearBiome(Biome.BiomeType.Shore);
-                break;
-            case Biome.BiomeType.Alpine:
-            case Biome.BiomeType.Mesa:
-                LevelManager.ClearBiome(Biome.BiomeType.Tropics);
-                break;
-            case Biome.BiomeType.Volcano:
-                LevelManager.ClearBiome(Biome.BiomeType.Alpine);
-                LevelManager.ClearBiome(Biome.BiomeType.Mesa);
-                break;
-        }
-    }
-    
-    private void OnBiomeComplete(Biome.BiomeType biomeType)
-    {
-        // Make sure everyone initializes the level manager
-        if (biomeType == Biome.BiomeType.Shore)
-        {
-            LevelManager.Init(LevelState.GetBiomeTypes());
-            LevelManager.InitCalderaSpawns();
-        }
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            Log.LogInfo($"Biome complete: {biomeType}");
-
-            switch (biomeType)
-            {
-                case Biome.BiomeType.Shore:
-                    _teleportHandler.Init(LevelState.GetBiomeTypes());
-                    LevelManager.InitBiome(Biome.BiomeType.Shore);
-                    break;
-                case Biome.BiomeType.Tropics:
-                    LevelManager.InitBiome(Biome.BiomeType.Tropics);
-                    break;
-                case Biome.BiomeType.Alpine:
-                    LevelManager.InitBiome(Biome.BiomeType.Alpine);
-                    break;
-                case Biome.BiomeType.Mesa:
-                    LevelManager.InitBiome(Biome.BiomeType.Mesa);
-                    break;
-                case Biome.BiomeType.Volcano:
-                    LevelManager.SpawnCalderaSpawns();
-                    break;
-            }
-        }
-
-        //if (biomeType == Biome.BiomeType.Volcano)
-       // {
-        //    Log.LogInfo("Initializing Caldera lava");
-         //   LevelManager.InitCalderaLava();            
-        //}
-
-        
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        Log.LogInfo($"Scene loaded: {scene.name}");
-        
-        // Game start detection grabbed from https://github.com/PEAKModding/PEAKLib/blob/main/tests/PEAKLib.Tests/Plugin.cs
-        Match match = new Regex(@"^Level_(\d+)$").Match(scene.name);
-        if (mode == LoadSceneMode.Single && match.Success &&
-            int.TryParse(match.Groups[1].Value, out _) &&
-            PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
-        {
-            Log.LogInfo("Game Start detected");
-            _isGameStarted = true;
-        }
-
-        if (scene.name == "Airport" || scene.name.ToLower().StartsWith("airp"))
-        {
-            StatusMessageHandler.DeInit();
-            CleanupNetwork();
-            StartCoroutine(DelayedInitNetwork());
-            LevelManager.Reset();
         }
     }
 }

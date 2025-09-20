@@ -1,7 +1,8 @@
 namespace HazardSpam.Types;
 
-public enum BiomeArea
+public enum SubZoneArea
 {
+    Unknown,
     Plateau,
     Wall,
     WallLeft,
