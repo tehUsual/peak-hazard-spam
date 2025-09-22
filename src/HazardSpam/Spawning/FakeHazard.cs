@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace HazardSpam.Spawning;
 
-public class SpawnedPropHS : MonoBehaviour
+public class FakeHazard : MonoBehaviour
 {
     
 }

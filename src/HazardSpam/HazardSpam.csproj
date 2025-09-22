@@ -11,27 +11,45 @@
     <Version>1.3.0</Version>
   </PropertyGroup>
 
-<!--
+
   <ItemGroup>
     <Compile Include="..\..\..\ConsoleTools\src\ConsoleTools\**\*.cs">
       <Link>ConsoleTools\%(RecursiveDir:ConsoleTools\)%(Filename)%(Extension)</Link>
     </Compile>
     <None Remove="..\..\..\ConsoleTools\src\ConsoleTools\**\*.*" />
   </ItemGroup>
--->
   
+  <ItemGroup>
+    <Compile Include="..\..\..\NetGameState\src\NetGameState\**\*.cs"
+             Exclude="..\..\..\NetGameState\src\NetGameState\Plugin.cs">
+      <Link>NetGameState\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+	<None Remove="..\..\..\NetGameState\src\NetGameState\**\*.*" />
+  </ItemGroup>
+
 <!--
   <ItemGroup>
     <Compile Include="..\..\..\NetGameState\src\NetGameState\**\*.cs">
 	  <Link>ConsoleTools\%(RecursiveDir:ConsoleTools\)%(Filename)%(Extension)</Link>
 	</Compile>
-	<None Remove="..\..\..\NetGameState\src\NetGameState\**\*.*" />
+	
+	<None Remove="..\..\..\NetGameState\src\NetGameState\Plugin.cs" />
   </ItemGroup>
 -->
 
+<!--
   <ItemGroup>
     <ProjectReference Include="..\..\..\NetGameState\src\NetGameState\NetGameState.csproj" />
   </ItemGroup>
+-->
+
+<!--
+  <ItemGroup>
+    <Folder Include="LevelStructure\" />
+    <Folder Include="Patches\" />
+  </ItemGroup>
+
+-->
 
   <!--
   How to include thunderstore mods as dependencies via nuget
