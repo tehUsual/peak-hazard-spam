@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using HazardSpam.Level;
 using HazardSpam.Spawning;
 using HazardSpam.Types;
 
@@ -15,62 +16,62 @@ public static class ConfigHandler
     internal static bool Debug => _configDebug.Value;
     internal static float CalderaEruptSpawnMinTime => _configCalderaEruptSpawnMinTime.Value;
     internal static float CalderaEruptSpawnMaxTime => _configCalderaEruptSpawnMaxTime.Value;
-    
+
     // SpawnRates
-    private static readonly Dictionary<(Biome.BiomeType, BiomeArea, SpawnType), ConfigEntry<int>> SpawnRatesDict = [];
-    
+    private static readonly Dictionary<(OurBiome, BiomeArea, SpawnType), ConfigEntry<int>> SpawnRatesDict = [];
+
     public static void Init(ConfigFile config)
     {
         _configDebug = config.Bind("Debug", "Debug", false, "Enabled debug logging and utils");
-        
+
         // Caldera eruptions
         _configCalderaEruptSpawnMinTime = config.Bind("CalderaEruption", "SpawnMinTime", -5f, "Minimum time between erupts");
         _configCalderaEruptSpawnMaxTime = config.Bind("CalderaEruption", "SpawnMaxTime", 15f, "Maximum time between erupts");
-        
+
         InitSpawnRates(config);
     }
-    
+
     private static void InitSpawnRates(ConfigFile config)
     {
-        
+
         // Shore
-        BindSpawnRates(config, Biome.BiomeType.Shore, BiomeArea.Plateau, SpawnType.Jellies, 1000);
-        BindSpawnRates(config, Biome.BiomeType.Shore, BiomeArea.Wall, SpawnType.Jellies, 2000);
+        BindSpawnRates(config, OurBiome.Shore, BiomeArea.Plateau, SpawnType.Jellies, 1000);
+        BindSpawnRates(config, OurBiome.Shore, BiomeArea.Wall, SpawnType.Jellies, 2000);
 
         // Tropics
-        BindSpawnRates(config, Biome.BiomeType.Tropics, BiomeArea.Wall, SpawnType.ExploShrooms, 2000);
-        BindSpawnRates(config, Biome.BiomeType.Tropics, BiomeArea.Wall, SpawnType.PoisonShrooms, 2000);
+        BindSpawnRates(config, OurBiome.Tropics, BiomeArea.Wall, SpawnType.ExploShrooms, 2000);
+        BindSpawnRates(config, OurBiome.Tropics, BiomeArea.Wall, SpawnType.PoisonShrooms, 2000);
 
         // Alpine
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallLeft, SpawnType.LavaRiver, 7);
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallRight, SpawnType.LavaRiver, 7);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.WallLeft, SpawnType.LavaRiver, 7);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.WallRight, SpawnType.LavaRiver, 7);
 
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallLeft, SpawnType.Geysers, 150);
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallLeft, SpawnType.FlashPlant, 150);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.WallLeft, SpawnType.Geysers, 150);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.WallLeft, SpawnType.FlashPlant, 150);
 
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallRight, SpawnType.Geysers, 150);
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.WallRight, SpawnType.FlashPlant, 150);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.WallRight, SpawnType.Geysers, 150);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.WallRight, SpawnType.FlashPlant, 150);
 
-        BindSpawnRates(config, Biome.BiomeType.Alpine, BiomeArea.Plateau, SpawnType.Geysers, 200);
+        BindSpawnRates(config, OurBiome.Alpine, BiomeArea.Plateau, SpawnType.Geysers, 200);
 
         // Mesa
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Plateau, SpawnType.CactusBalls, 1500);
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Plateau, SpawnType.Tumblers, 3);
+        BindSpawnRates(config, OurBiome.Mesa, BiomeArea.Plateau, SpawnType.CactusBalls, 1500);
+        BindSpawnRates(config, OurBiome.Mesa, BiomeArea.Plateau, SpawnType.Tumblers, 3);
 
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.CactusBalls, 1500);
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.Dynamite, 200);
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.DynamiteOutside, 200);
-        BindSpawnRates(config, Biome.BiomeType.Mesa, BiomeArea.Wall, SpawnType.Scorpions, 5);
+        BindSpawnRates(config, OurBiome.Mesa, BiomeArea.Wall, SpawnType.CactusBalls, 1500);
+        BindSpawnRates(config, OurBiome.Mesa, BiomeArea.Wall, SpawnType.Dynamite, 200);
+        BindSpawnRates(config, OurBiome.Mesa, BiomeArea.Wall, SpawnType.DynamiteOutside, 200);
+        BindSpawnRates(config, OurBiome.Mesa, BiomeArea.Wall, SpawnType.Scorpions, 5);
     }
 
-    private static void BindSpawnRates(ConfigFile config, Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType, int defaultValue)
+    private static void BindSpawnRates(ConfigFile config, OurBiome biomeType, BiomeArea area, SpawnType spawnType, int defaultValue)
     {
         string key = $"{biomeType}.{area}-{spawnType}";
         var entry = config.Bind("SpawnRates", key, defaultValue, "Attempted spawn rate, will not guarantee this amount");
         SpawnRatesDict[(biomeType, area, spawnType)] = entry;
     }
 
-    public static int GetSpawnRate(Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType)
+    public static int GetSpawnRate(OurBiome biomeType, BiomeArea area, SpawnType spawnType)
     {
         return SpawnRatesDict.TryGetValue((biomeType, area, spawnType), out var entry) ? entry.Value : 0;
     }

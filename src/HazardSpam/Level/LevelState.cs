@@ -1,9 +1,49 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HazardSpam.Level;
+
+// Game does not define Caldera in its Biome enum. WTF!?
+public enum OurBiome
+{
+    Shore = 0,
+    Tropics = 1,
+    Roots = 2,
+    Alpine = 3,
+    Mesa = 4,
+    Caldera = 5,
+    Kiln = 6,
+    Peak = 7,
+}
+
+public static class BiomeConv
+{
+    public static OurBiome FromSegmentBiome(Segment s, Biome.BiomeType b)
+    {
+        switch (s)
+        {
+            case Segment.Caldera:
+                return OurBiome.Caldera;
+            case Segment.TheKiln:
+                return OurBiome.Kiln;
+            case Segment.Peak:
+                return OurBiome.Peak;
+            case Segment.Tropics:
+                if (b == Biome.BiomeType.Roots) return OurBiome.Roots;
+                else return OurBiome.Tropics;
+            case Segment.Alpine:
+                if (b == Biome.BiomeType.Alpine) return OurBiome.Alpine;
+                else return OurBiome.Mesa;
+            case Segment.Beach:
+            default:
+                return OurBiome.Shore;
+        }
+    }
+}
+
 
 public static class LevelState
 {
@@ -12,41 +52,37 @@ public static class LevelState
         _mapHandlerInstance ?? throw new InvalidOperationException("MapHandler not set yet.");
 
     private static bool _triedToFetchMapHandler = false;
-    
-    // Segments
-    // { Beach, Tropics, Alpine, Caldera, TheKiln, Peak }
-    private static Biome.BiomeType _currentBiome = Biome.BiomeType.Shore;
-    // BiomeType
-    //{ Shore = 0, Tropics = 1, Alpine = 2, Volcano = 3, Peak = 5, Mesa = 6, Colony = 7 }
-    
-    public static event Action<Biome.BiomeType>? OnBiomeLoading;
-    public static event Action<Biome.BiomeType>? OnBiomeComplete;
-    
+
+    private static OurBiome _currentBiome = OurBiome.Shore;
+
+    public static event Action<OurBiome>? OnBiomeLoading;
+    public static event Action<OurBiome>? OnBiomeComplete;
+
     public static void Initialize(MapHandler instance)
     {
         if (_mapHandlerInstance != null) return;
         _mapHandlerInstance = instance;
     }
 
-    public static List<Biome.BiomeType> GetBiomeTypes()
+    public static List<OurBiome> GetBiomeTypes()
     {
-        if (_mapHandlerInstance == null) 
+        if (_mapHandlerInstance == null)
         {
             Plugin.Log.LogError("[LevelState] MapHandler is null, could not trigger GetBiomeTypes()");
-            return new List<Biome.BiomeType>();
+            return new List<OurBiome>();
         }
         Plugin.Log.LogInfo($"[LevelState] Got biome types: {string.Join(", ", _mapHandlerInstance.biomes)}");
-        return _mapHandlerInstance.biomes;
+        return _mapHandlerInstance.segments.Select((s, i) => BiomeConv.FromSegmentBiome((Segment) i, s.biome)).Distinct().ToList();
     }
 
-    public static void SetBiomeLoading(Biome.BiomeType biomeType)
+    public static void SetBiomeLoading(OurBiome b)
     {
-        Plugin.Log.LogInfo($"[LevelState] Biome loading: {biomeType}");
-        _currentBiome = biomeType;
+        _currentBiome = b;
+        Plugin.Log.LogInfo($"[LevelState] Biome loading: {_currentBiome}");
         if (_mapHandlerInstance != null)
             _mapHandlerInstance.StartCoroutine(InvokeOnBiomeLoading(_currentBiome));
         else
-            Plugin.Log.LogError($"[LevelState] MapHandler is null, did not trigger SetBiomeLoading() for {biomeType}");
+            Plugin.Log.LogError($"[LevelState] MapHandler is null, did not trigger SetBiomeLoading() for {_currentBiome}");
     }
 
     public static void SetBiomeLoading()
@@ -61,12 +97,7 @@ public static class LevelState
         {
             Biome.BiomeType biomeType = _mapHandlerInstance.GetCurrentBiome();
             Segment segment = _mapHandlerInstance.GetCurrentSegment();
-            
-            // lazy
-            if (segment == Segment.TheKiln)
-                SetBiomeLoading(Biome.BiomeType.Colony);
-            else
-                SetBiomeLoading(biomeType);
+            SetBiomeLoading(BiomeConv.FromSegmentBiome(segment, biomeType));
         }
         else
             Plugin.Log.LogError("[LevelState] MapHandler is null, did not trigger SetBiomeLoading()");
@@ -76,28 +107,28 @@ public static class LevelState
     {
         var go = GameObject.Find("Map");
         if (go == null) return false;
-        
+
         var mapHandler = go.GetComponent<MapHandler>();
         if (mapHandler == null) return false;
-        
+
         Initialize(mapHandler);
         return true;
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
-    private static IEnumerator InvokeOnBiomeLoading(Biome.BiomeType biomeType)
+    private static IEnumerator InvokeOnBiomeLoading(OurBiome biomeType)
     {
         yield return null;
         OnBiomeLoading?.Invoke(biomeType);
     }
 
-    public static void SetBiomeComplete(Biome.BiomeType biomeType)
+    public static void SetBiomeComplete(OurBiome b)
     {
-        Plugin.Log.LogInfo($"[LevelState] Segment complete: {biomeType}");
+        Plugin.Log.LogInfo($"[LevelState] Segment complete: {b}");
         if (_mapHandlerInstance != null)
-            _mapHandlerInstance.StartCoroutine(InvokeOnBiomeComplete(biomeType));
+            _mapHandlerInstance.StartCoroutine(InvokeOnBiomeComplete(b));
         else
-            Plugin.Log.LogError($"[LevelState] MapHandler is null, did not trigger SetBiomeLoading() for {biomeType}");
+            Plugin.Log.LogError($"[LevelState] MapHandler is null, did not trigger SetBiomeLoading() for {b}");
     }
 
     public static void SetBiomeComplete()
@@ -106,19 +137,14 @@ public static class LevelState
         {
             Biome.BiomeType biomeType = _mapHandlerInstance.GetCurrentBiome();
             Segment segment = _mapHandlerInstance.GetCurrentSegment();
-            
-            // lazy
-            if (segment == Segment.TheKiln)
-                SetBiomeComplete(Biome.BiomeType.Colony);
-            else
-                SetBiomeComplete(biomeType);
+            SetBiomeComplete(BiomeConv.FromSegmentBiome(segment, biomeType));
         }
         else
             Plugin.Log.LogError("[LevelState] MapHandler is null, did not trigger SetBiomeComplete()");
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
-    private static IEnumerator InvokeOnBiomeComplete(Biome.BiomeType biomeType)
+    private static IEnumerator InvokeOnBiomeComplete(OurBiome biomeType)
     {
         yield return null;
         OnBiomeComplete?.Invoke(biomeType);

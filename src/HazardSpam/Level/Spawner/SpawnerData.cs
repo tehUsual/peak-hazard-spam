@@ -14,13 +14,13 @@ public class SpawnerData
     public GameObject Prefab { get; }
     private int _defaultNrOfSpawns;
     private readonly List<SpawnInfo> _spawnInfo = [];
-    
-    public Biome.BiomeType BiomeType { get; private set; }
+
+    public OurBiome BiomeType { get; private set; }
     public BiomeArea Area { get; private set; }
     public SpawnType SpawnType { get; private set; }
-    
-    
-    public SpawnerData(PropSpawner propSpawner, GameObject prefab, Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType)
+
+
+    public SpawnerData(PropSpawner propSpawner, GameObject prefab, OurBiome biomeType, BiomeArea area, SpawnType spawnType)
     {
         PropSpawner = propSpawner;
         Prefab = prefab;
@@ -38,7 +38,7 @@ public class SpawnerData
     public void AddSpawnInfos(Vector3[] positions, Quaternion[] rotations, float[]? scaleGains)
     {
         if (positions.Length == _spawnInfo.Count) return;
-        
+
         for (int i = 0; i < positions.Length; i++)
         {
             if (scaleGains != null)
@@ -62,7 +62,7 @@ public class SpawnerData
         Vector3[] positions = new Vector3[count];
         Quaternion[] rotations = new Quaternion[count];
         float[] scaleGains = new float[count];
-        
+
         for (int i = 0; i < count; i++)
         {
             positions[i] = _spawnInfo[i].Position;
@@ -83,14 +83,14 @@ public class SpawnerData
                 scaleGains[i] = Random.Range(scaleGainMin, scaleGainMax);
             }
         }
-        
+
         return (positions, rotations, scaleGains);
     }
 
     public (Vector3[] positions, Quaternion[] rotations, float[] scaleGains) GenerateSpawnPoints(int attempts)
     {
         if (!PhotonNetwork.IsMasterClient) return ([], [], []);
-        
+
         int spawnPosCount = 0;
         int currentAttempt = 0;
         int failedAttempts = 0;
@@ -98,13 +98,13 @@ public class SpawnerData
         List<Vector3> positions = [];
         List<Quaternion> rotations = [];
         List<float> scaleGains = [];
-        
+
         while (spawnPosCount < attempts && currentAttempt < attempts)
         {
             var getRandomPoint = PropSpawner.GetType().GetMethod("GetRandomPoint",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (getRandomPoint == null) break;
-            
+
             currentAttempt++;
             try
             {
@@ -113,12 +113,12 @@ public class SpawnerData
 
                 var pos = (Vector3)spawnData.GetType().GetField("pos").GetValue(spawnData);
                 var normal = (Vector3)spawnData.GetType().GetField("normal").GetValue(spawnData);
-                var rotation = HelperFunctions.GetRandomRotationWithUp(normal); 
+                var rotation = HelperFunctions.GetRandomRotationWithUp(normal);
 
                 positions.Add(pos);
                 rotations.Add(rotation);
                 scaleGains.Add(0f);
-                
+
                 spawnPosCount++;
             }
             catch (Exception)
@@ -127,7 +127,7 @@ public class SpawnerData
             }
         }
         Plugin.Log.LogInfo($"Generated {spawnPosCount} spawn points, {failedAttempts} failed (which is fine)");
-        
+
         return (positions.ToArray(), rotations.ToArray(), scaleGains.ToArray());
     }
 }

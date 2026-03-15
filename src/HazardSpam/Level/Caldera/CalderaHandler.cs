@@ -11,11 +11,11 @@ public static class CalderaHandler
     private static PropSpawner? _propSpawner;
     private static GameObject? _prefab;
     private static bool _isSpawnInit = false;
-    
-    
+
+
     public static Transform? GetSpawner => _spawner;
     public static GameObject? GetPrefab => _prefab;
-    
+
     public static void InitCaldera()
     {
         var go = GameObject.Find("Map/Biome_4/Volcano/Caldera_Segment/River");
@@ -61,13 +61,13 @@ public static class CalderaHandler
             Plugin.Log.LogError($"[CalderaHandler.InitSpawns] Could not find PropSpawner on {sourcePath}");
             return;
         }
-        
+
         if (targetPs == null)
         {
             Plugin.Log.LogError($"[CalderaHandler.InitSpawns] Could not find PropSpawner on {targetPath}");
             return;
         }
-        
+
         targetPs.props = sourcePs.props;
         targetPs.area.y = 420;
 
@@ -75,7 +75,7 @@ public static class CalderaHandler
         _propSpawner = targetPs;
         _prefab = targetPs.props[0];
         _isSpawnInit = true;
-        
+
         Plugin.Log.LogInfo($"[CalderaHandler.InitSpawns] Initialized spawns for {sourcePath} -> {targetPath}");
     }
 
@@ -87,7 +87,7 @@ public static class CalderaHandler
             Plugin.Log.LogError($"[ClearCaldera] Could not find LavaRiver in Caldera");
             return;
         }
-        
+
         var comp = go.GetComponent<LavaRiverSpeedHandler>();
         if (comp == null)
         {
@@ -97,13 +97,13 @@ public static class CalderaHandler
         {
             comp.enabled = false;
         }
-        
+
         _isSpawnInit = false;
         _spawner = null;
         _propSpawner = null;
         _prefab = null;
     }
-    
+
     public static (Vector3[] positions, Quaternion[] rotations, float[] scaleGains) GenerateSpawnPoints(int attempts)
     {
         if (!PhotonNetwork.IsMasterClient) return ([], [], []);
@@ -114,7 +114,7 @@ public static class CalderaHandler
                 $"_isSpawnInit: {_isSpawnInit}, _propSpawner is null: {_propSpawner == null}, _spawner is null: {_spawner == null}, _prefab is null: {_prefab == null}");
             return ([], [], []);
         }
-    
+
         int spawnPosCount = 0;
         int currentAttempt = 0;
         int failedAttempts = 0;
@@ -122,13 +122,13 @@ public static class CalderaHandler
         List<Vector3> positions = [];
         List<Quaternion> rotations = [];
         List<float> scaleGains = [];
-        
+
         while (spawnPosCount < attempts && currentAttempt < attempts * 4)
         {
             var getRandomPoint = _propSpawner.GetType().GetMethod("GetRandomPoint",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (getRandomPoint == null) break;
-            
+
             currentAttempt++;
             try
             {
@@ -137,12 +137,12 @@ public static class CalderaHandler
 
                 var pos = (Vector3)spawnData.GetType().GetField("pos").GetValue(spawnData);
                 var normal = (Vector3)spawnData.GetType().GetField("normal").GetValue(spawnData);
-                var rotation = HelperFunctions.GetRandomRotationWithUp(normal); 
+                var rotation = HelperFunctions.GetRandomRotationWithUp(normal);
 
                 positions.Add(pos);
                 rotations.Add(rotation);
                 scaleGains.Add(0f);
-                
+
                 spawnPosCount++;
             }
             catch (Exception)
@@ -151,7 +151,7 @@ public static class CalderaHandler
             }
         }
         Plugin.Log.LogInfo($"Generated {spawnPosCount} spawn points, {failedAttempts} failed (which is fine)");
-        
+
         return (positions.ToArray(), rotations.ToArray(), scaleGains.ToArray());
     }
 }

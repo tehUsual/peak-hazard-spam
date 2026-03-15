@@ -19,16 +19,17 @@ public static class LevelManager
     // Apline   { "Default", "Lava", "Spiky", "GeyserHell" };
 
     public static List<BiomeInfo> BiomeInfo { get; } = [];
-    public static BiomeInfo? GetShoreBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == Biome.BiomeType.Shore);
-    public static BiomeInfo? GetTropicBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == Biome.BiomeType.Tropics);
-    public static BiomeInfo? GetAlpineBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == Biome.BiomeType.Alpine);
-    public static BiomeInfo? GetMesaBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == Biome.BiomeType.Mesa);
+    public static BiomeInfo? GetShoreBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == OurBiome.Shore);
+    public static BiomeInfo? GetTropicBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == OurBiome.Tropics);
+    public static BiomeInfo? GetAlpineBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == OurBiome.Alpine);
+    public static BiomeInfo? GetMesaBiome() => BiomeInfo.FirstOrDefault(b => b.BiomeType == OurBiome.Mesa);
 
-    public static BiomeInfo? GetBiomeInfo(Biome.BiomeType biomeType) => BiomeInfo.FirstOrDefault(b => b.BiomeType == biomeType);
-    
-    
-    public static void Init(List<Biome.BiomeType> currentBiomeTypes)
+    public static BiomeInfo? GetBiomeInfo(OurBiome biomeType) => BiomeInfo.FirstOrDefault(b => b.BiomeType == biomeType);
+
+    public static List<OurBiome> bs = [];
+    public static void Init(List<OurBiome> currentBiomeTypes)
     {
+        bs = currentBiomeTypes;
         Reset();
         GatherBiomesInfo(currentBiomeTypes);
     }
@@ -42,15 +43,15 @@ public static class LevelManager
         BiomeInfo.Clear();
         CalderaHandler.ClearCaldera();
     }
-    
-    private static void GatherBiomesInfo(List<Biome.BiomeType> biomeTypes)
+
+    private static void GatherBiomesInfo(List<OurBiome> biomeTypes)
     {
         Plugin.Log.LogInfo($"Gathering info for BiomeTypes: {string.Join(", ", LevelState.GetBiomeTypes())}");
-        foreach (Biome.BiomeType biomeType in biomeTypes)
+        foreach (OurBiome biomeType in biomeTypes)
         {
-            if (biomeType == Biome.BiomeType.Volcano)
+            if (biomeType == OurBiome.Kiln)
                 continue;
-            
+
             BiomeInfo? biomeInfo = BiomeFinder.FindActiveBiome(biomeType);
             if (biomeInfo == null)
             {
@@ -59,7 +60,7 @@ public static class LevelManager
             }
             BiomeInfo.Add(biomeInfo);
         }
-        
+
         foreach (var biomeInfo in BiomeInfo)
         {
             Plugin.Log.LogInfo(
@@ -86,12 +87,12 @@ public static class LevelManager
         }
     }
 
-    public static void InitBiome(Biome.BiomeType biomeType, float intervalDelay = 0.15f)
-    { 
-        SpawnerNetwork.Instance.StartCoroutine(InvokeInitBiome(biomeType, intervalDelay));    
+    public static void InitBiome(OurBiome biomeType, float intervalDelay = 0.15f)
+    {
+        SpawnerNetwork.Instance.StartCoroutine(InvokeInitBiome(biomeType, intervalDelay));
     }
 
-    private static IEnumerator InvokeInitBiome(Biome.BiomeType biomeType, float intervalDelay)
+    private static IEnumerator InvokeInitBiome(OurBiome biomeType, float intervalDelay)
     {
         BiomeInfo? biomeInfo = GetBiomeInfo(biomeType);
         if (biomeInfo == null)
@@ -114,25 +115,25 @@ public static class LevelManager
             if (pos.Length > 0)
             {
                 // Dirty, add delay for shore to ensure clients also get the props
-                if (biomeInfo.BiomeType == Biome.BiomeType.Shore)
+                if (biomeInfo.BiomeType == OurBiome.Shore)
                 {
-                    Plugin.Log.LogInfo($"CRUDE FIX: Delaying shore spawn for 12 seconds");   
+                    Plugin.Log.LogInfo($"CRUDE FIX: Delaying shore spawn for 12 seconds");
                     yield return new WaitForSeconds(12f);
                 }
-                
+
                 SpawnerNetwork.Instance.SpawnPropsNetwork(spawner, pos, rot, scaleGain);
             }
 
             yield return new WaitForSeconds(intervalDelay);
         }
     }
-    
-    public static void ClearBiome(Biome.BiomeType biomeType, float intervalDelay = 0.15f)
+
+    public static void ClearBiome(OurBiome biomeType, float intervalDelay = 0.15f)
     {
         SpawnerNetwork.Instance.StartCoroutine(InvokeClearBiome(biomeType, intervalDelay));
     }
 
-    private static IEnumerator InvokeClearBiome(Biome.BiomeType biomeType, float intervalDelay)
+    private static IEnumerator InvokeClearBiome(OurBiome biomeType, float intervalDelay)
     {
         BiomeInfo? biomeInfo = GetBiomeInfo(biomeType);
         if (biomeInfo == null)

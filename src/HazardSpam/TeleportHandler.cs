@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HazardSpam.Level;
 using Photon.Pun;
 using UnityEngine;
 
@@ -10,15 +11,15 @@ public class TeleportHandler
     private Transform? _tropicsCampfire;
     private Transform? _alpineMesaCampfire;
     private Transform? _calderaCampfire;
-    
-    
-    public void Init(List<Biome.BiomeType> currentBiomeTypes)
+
+
+    public void Init(List<OurBiome> currentBiomeTypes)
     {
-        foreach (Biome.BiomeType biomeType in currentBiomeTypes)
+        foreach (OurBiome biomeType in currentBiomeTypes)
         {
             switch (biomeType)
             {
-                case Biome.BiomeType.Shore:
+                case OurBiome.Shore:
                 {
                     var go = GameObject.Find("Map/Biome_1/Beach/Beach_Campfire/Campfire");
                     if (go != null)
@@ -30,10 +31,10 @@ public class TeleportHandler
                         Plugin.Log.LogDebug($"Could not find Shore Campfire.");
                     break;
                 }
-                    
-                case Biome.BiomeType.Tropics:
+
+                case OurBiome.Tropics:
                 {
-                    var go = GameObject.Find("Map/Biome_2/Jungle/Jungle_Campfire/Campfire");
+                    var go = GameObject.Find("Map/Biome_2/Tropics/Jungle_Campfire/Campfire");
                     if (go != null)
                     {
                         _tropicsCampfire = go.transform;
@@ -44,9 +45,9 @@ public class TeleportHandler
                     break;
                 }
 
-                case Biome.BiomeType.Alpine:
+                case OurBiome.Alpine:
                 {
-                    var go = GameObject.Find("Map/Biome_3/Snow/Snow_Campfire/Campfire");
+                    var go = GameObject.Find("Map/Biome_3/Alpine/Snow_Campfire/Campfire");
                     if (go != null)
                     {
                         _alpineMesaCampfire = go.transform;
@@ -57,10 +58,10 @@ public class TeleportHandler
                     break;
                 }
 
-                case Biome.BiomeType.Mesa:
+                case OurBiome.Mesa:
                 {
-                    var go = GameObject.Find("Map/Biome_3/Desert/Desert_Campfire/Snow_Campfire/Campfire");
-                    if (go != null) 
+                    var go = GameObject.Find("Map/Biome_3/Mesa/Desert_Campfire/Snow_Campfire/Campfire");
+                    if (go != null)
                     {
                         _alpineMesaCampfire = go.transform;
                         Plugin.Log.LogInfo($"Found Mesa Campfire");
@@ -70,7 +71,7 @@ public class TeleportHandler
                     break;
                 }
 
-                case Biome.BiomeType.Volcano:
+                case OurBiome.Caldera:
                 {
                     var go = GameObject.Find("Map/Biome_4/Volcano/Volcano_Campfire/Campfire");
                     if (go != null)
@@ -101,29 +102,29 @@ public class TeleportHandler
     {
         if (_tropicsCampfire == null)
             return;
-        
+
         foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
             character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _tropicsCampfire.position, false);
         }
     }
-    
+
     public void WarpToAlpineMesaCampfire()
     {
         if (_alpineMesaCampfire == null)
             return;
-        
+
         foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
             character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _alpineMesaCampfire.position, false);
         }
     }
-    
+
     public void WarpToCalderaCampfire()
     {
         if (_calderaCampfire == null)
             return;
-        
+
         foreach (var character in PlayerHandler.GetAllPlayerCharacters())
         {
             character.photonView.RPC("WarpPlayerRPC", RpcTarget.All, _calderaCampfire.position, false);

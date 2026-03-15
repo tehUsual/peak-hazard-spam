@@ -26,13 +26,13 @@ public class SpawnerNetwork : MonoBehaviourPun
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
-    
+
     public void SpawnPropsNetwork(SpawnerData spawnData, Vector3[] positions, Quaternion[] rotations, float[] scaleGains)
     {
         if (positions.Length == 0) return;
-        
+
         Plugin.Log.LogInfo($"[Network] Sending 'RPC_SpawnProps' for {positions.Length} at {spawnData.BiomeType.ToString()}/{spawnData.Area.ToString()}/{spawnData.SpawnType.ToString()}");
-        
+
         photonView.RPC(
             "RPC_SpawnProps",
             RpcTarget.All,
@@ -45,22 +45,22 @@ public class SpawnerNetwork : MonoBehaviourPun
     {
         if (positions.Length == 0) return;
         Plugin.Log.LogInfo($"[Network] Sending 'RPC_SpawnProps' for {positions.Length} at {nameof(Biome.BiomeType.Volcano)}/Plateau/SlipperyJellyfish");
-        
+
         photonView.RPC(
             "RPC_SpawnProps",
             RpcTarget.All,
-            Biome.BiomeType.Volcano, BiomeArea.Plateau, SpawnType.Jellies,
+            OurBiome.Caldera, BiomeArea.Plateau, SpawnType.Jellies,
             positions, rotations
         );
     }
 
     [PunRPC]
-    public void RPC_SpawnProps(Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType,
+    public void RPC_SpawnProps(OurBiome biomeType, BiomeArea area, SpawnType spawnType,
         Vector3[] positions, Quaternion[] rotations)
     {
         Plugin.Log.LogInfo($"[Network] Received 'RPC_SpawnProps' for {positions.Length} at {biomeType.ToString()}/{area.ToString()}/{spawnType.ToString()}");
 
-        if (biomeType == Biome.BiomeType.Volcano)
+        if (biomeType == OurBiome.Caldera)
         {
             StartCoroutine(SpawnPropsInWorldCaldera(positions, rotations));
         }
@@ -68,17 +68,17 @@ public class SpawnerNetwork : MonoBehaviourPun
         {
             BiomeInfo? biomeInfo = LevelManager.GetBiomeInfo(biomeType);
             if (biomeInfo == null) return;
-            
+
             foreach (var spawner in biomeInfo.Spawners)
             {
                 if (spawner.Area == area && spawner.SpawnType == spawnType)
                 {
-                    string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}"; 
+                    string areaName = $"{spawner.BiomeType.ToString()}/{spawner.Area.ToString()}";
                     //StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, scaleGain, areaName));
                     StartCoroutine(SpawnPropsInWorld(spawner, positions, rotations, areaName));
                     return;
                 }
-            }    
+            }
         }
     }
 
@@ -90,9 +90,9 @@ public class SpawnerNetwork : MonoBehaviourPun
         if (spawnerTrans == null || prefab == null)
         {
             Plugin.Log.LogError("Could not find Caldera spawner or prefab");
-            yield break;    
+            yield break;
         }
-        
+
         int spawns = 0;
         for (int i = 0; i < positions.Length; i++)
         {
@@ -102,7 +102,7 @@ public class SpawnerNetwork : MonoBehaviourPun
                 go.AddComponent<SpawnedPropHS>();
                 spawns++;
             }
-            
+
             if (i % 50 == 0 && i != 0) yield return null;
         }
         Plugin.Log.LogInfo($"Spawned {spawns}/{positions.Length} '{prefab.name}' in Caldera/Plateau");
@@ -121,17 +121,17 @@ public class SpawnerNetwork : MonoBehaviourPun
                 spawnerData.AddSpawnInfo(positions[i], rotations[i]);
                 spawns++;
             }
-            
+
             if (i % 50 == 0 && i != 0) yield return null;
         }
         Plugin.Log.LogInfo($"Spawned {spawns}/{positions.Length} '{spawnerData.Prefab.name}' in {area}");
     }
 
-    
+
     public void ClearPropsNetwork(SpawnerData spawnData)
     {
         Plugin.Log.LogInfo($"[Network] Sending 'RPC_ClearProps' {spawnData.BiomeType.ToString()}/{spawnData.Area.ToString()}/{spawnData.SpawnType.ToString()}");
-        
+
         photonView.RPC(
             "RPC_ClearProps",
             RpcTarget.All,
@@ -141,13 +141,13 @@ public class SpawnerNetwork : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void RPC_ClearProps(Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType)
+    public void RPC_ClearProps(OurBiome biomeType, BiomeArea area, SpawnType spawnType)
     {
         Plugin.Log.LogInfo($"[Network] Received 'RPC_ClearProps' at {biomeType.ToString()}/{area.ToString()}/{spawnType.ToString()}");
-        
+
         BiomeInfo? biomeInfo = LevelManager.GetBiomeInfo(biomeType);
         if (biomeInfo == null) return;
-    
+
         foreach (var spawner in biomeInfo.Spawners)
         {
             if (spawner.Area == area && spawner.SpawnType == spawnType)
@@ -159,7 +159,7 @@ public class SpawnerNetwork : MonoBehaviourPun
             }
         }
     }
-    
+
     private IEnumerator ClearPropsInWorld(SpawnerData spawnerData, string area)
     {
         int removed = 0;
@@ -171,11 +171,11 @@ public class SpawnerNetwork : MonoBehaviourPun
                 Destroy(go);
                 removed++;
             }
-            
+
             if (i % 50 == 0 && i != 0) yield return null;
         }
         spawnerData.Clear();
-        
+
         Plugin.Log.LogInfo($"Cleared {removed} '{spawnerData.SpawnType}' from {spawnerData.Area}");
     }
 }

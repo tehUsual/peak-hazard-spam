@@ -19,42 +19,42 @@ namespace HazardSpam;
 public partial class Plugin : BaseUnityPlugin
 {
     internal static ManualLogSource Log { get; private set; } = null!;
-    
+
     private const int SpawnerNetworkViewID = 9989;
 
     private bool _isGameStarted;
 
     private readonly TeleportHandler _teleportHandler = new TeleportHandler();
-    
+
     // PlayerConnectionLog.AddMessage(string s)
     // PlayerConnectionLog.OnPlayerEnteredRoom(player)
     private void Awake()
     {
         Log = Logger;
         Log.LogInfo($"Plugin {Name} is loaded!");
-        
+
         // Config
         ConfigHandler.Init(Config);
-        
+
         // Harmony patch
         var harmony = new Harmony("com.github.tehUsual.HazardSpam");
         harmony.PatchAll(typeof(LevelChangePatches));
         harmony.PatchAll(typeof(EruptionSpawnerPatches));
-        
+
         // network helper
         //InitNetwork();
-        
+
         // Callbacks
         SceneManager.sceneLoaded += OnSceneLoaded;
         LevelState.OnBiomeLoading += OnBiomeLoading;
         LevelState.OnBiomeComplete += OnBiomeComplete;
     }
-    
+
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-    
+
 
     private void InitNetwork()
     {
@@ -106,7 +106,7 @@ public partial class Plugin : BaseUnityPlugin
                         Player.localPlayer.character.refs.balloons.RemoveBalloon(balloon);
                     }
                 }
-                
+
                 // Teleports
                 if (Input.GetKeyDown(KeyCode.Keypad1))
                     _teleportHandler.WarpToShoreCampfire();
@@ -120,57 +120,54 @@ public partial class Plugin : BaseUnityPlugin
         }
     }
 
-    private void OnBiomeLoading(Biome.BiomeType biomeType)
+    private void OnBiomeLoading(OurBiome biomeType)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        
+
         Log.LogInfo($"[Main] Biome loading: {biomeType}");
 
         switch (biomeType)
         {
-            case Biome.BiomeType.Tropics:
-                LevelManager.ClearBiome(Biome.BiomeType.Shore);
+            case OurBiome.Tropics:
+                LevelManager.ClearBiome(OurBiome.Shore);
                 break;
-            case Biome.BiomeType.Alpine:
-            case Biome.BiomeType.Mesa:
-                LevelManager.ClearBiome(Biome.BiomeType.Tropics);
+            case OurBiome.Alpine:
+            case OurBiome.Mesa:
+                LevelManager.ClearBiome(OurBiome.Tropics);
                 break;
-            case Biome.BiomeType.Volcano:
-                LevelManager.ClearBiome(Biome.BiomeType.Alpine);
-                LevelManager.ClearBiome(Biome.BiomeType.Mesa);
+            case OurBiome.Caldera:
+                LevelManager.ClearBiome(OurBiome.Alpine);
+                LevelManager.ClearBiome(OurBiome.Mesa);
                 break;
         }
     }
-    
-    private void OnBiomeComplete(Biome.BiomeType biomeType)
+
+    private void OnBiomeComplete(OurBiome biomeType)
     {
         // Make sure everyone initializes the level manager
-        if (biomeType == Biome.BiomeType.Shore)
-        {
-            LevelManager.Init(LevelState.GetBiomeTypes());
-            LevelManager.InitCalderaSpawns();
-        }
+        LevelManager.Init(LevelState.GetBiomeTypes());
+        LevelManager.InitCalderaSpawns();
 
         if (PhotonNetwork.IsMasterClient)
         {
             Log.LogInfo($"Biome complete: {biomeType}");
 
+            _teleportHandler.Init(LevelState.GetBiomeTypes());
             switch (biomeType)
             {
-                case Biome.BiomeType.Shore:
-                    _teleportHandler.Init(LevelState.GetBiomeTypes());
-                    LevelManager.InitBiome(Biome.BiomeType.Shore);
+                case OurBiome.Shore:
+                    LevelManager.InitBiome(OurBiome.Shore);
                     break;
-                case Biome.BiomeType.Tropics:
-                    LevelManager.InitBiome(Biome.BiomeType.Tropics);
+                case OurBiome.Tropics:
+                    LevelManager.InitBiome(OurBiome.Tropics);
                     break;
-                case Biome.BiomeType.Alpine:
-                    LevelManager.InitBiome(Biome.BiomeType.Alpine);
+                case OurBiome.Alpine:
+                    LevelManager.InitBiome(OurBiome.Alpine);
                     break;
-                case Biome.BiomeType.Mesa:
-                    LevelManager.InitBiome(Biome.BiomeType.Mesa);
+                case OurBiome.Mesa:
+                    LevelManager.InitBiome(OurBiome.Mesa);
                     break;
-                case Biome.BiomeType.Volcano:
+                case OurBiome.Caldera:
                     LevelManager.SpawnCalderaSpawns();
                     break;
             }
@@ -179,16 +176,16 @@ public partial class Plugin : BaseUnityPlugin
         //if (biomeType == Biome.BiomeType.Volcano)
        // {
         //    Log.LogInfo("Initializing Caldera lava");
-         //   LevelManager.InitCalderaLava();            
+         //   LevelManager.InitCalderaLava();
         //}
 
-        
+
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Log.LogInfo($"Scene loaded: {scene.name}");
-        
+
         // Game start detection grabbed from https://github.com/PEAKModding/PEAKLib/blob/main/tests/PEAKLib.Tests/Plugin.cs
         Match match = new Regex(@"^Level_(\d+)$").Match(scene.name);
         if (mode == LoadSceneMode.Single && match.Success &&

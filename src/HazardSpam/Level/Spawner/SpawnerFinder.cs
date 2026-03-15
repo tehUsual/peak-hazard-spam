@@ -8,8 +8,8 @@ namespace HazardSpam.Level.Spawner;
 
 public static class SpawnerFinderAndInit
 {
-    
-    public static List<SpawnerData> GetSpawnersFromBiomeType(Transform activeBiome, Biome.BiomeType biomeType, string biomeVariant)
+
+    public static List<SpawnerData> GetSpawnersFromBiomeType(Transform activeBiome, OurBiome biomeType, string biomeVariant)
     {
         List<SpawnerData> spawners = [];
 
@@ -20,14 +20,14 @@ public static class SpawnerFinderAndInit
         }
 
 
-        if (biomeType == Biome.BiomeType.Alpine && biomeVariant != "Geysers")
+        if (biomeType == OurBiome.Alpine && biomeVariant != "Geysers")
         {
             spawners.AddRange(HandleAlpinePlateauGeyser(activeBiome, SpawnerDefinitions.AlpineGeyserPlateau));
         }
-        
+
         foreach (var spawner in spawners)
             Plugin.Log.LogInfo($"Added spawner '{spawner.SpawnType}' from {biomeType}/{biomeVariant}/{spawner.Area}");
-        
+
         return spawners;
     }
 
@@ -35,10 +35,10 @@ public static class SpawnerFinderAndInit
     {
         var geyser = activeBiome.parent.Find("GeyserHell/PlateauProps/Geysers");
         if (geyser == null || geyser.GetComponent<PropSpawner>() == null) yield break;
-        
+
         var plateau = activeBiome.Find("PlateauProps");
         if (plateau == null) yield break;
-        
+
         var newGeyser = Object.Instantiate(geyser.gameObject, plateau, worldPositionStays: true);
         newGeyser.SetActive(true);
 
@@ -51,7 +51,7 @@ public static class SpawnerFinderAndInit
         return GetSpawnersFromPath(activeBiome, bsd.BiomeType, bsd.Path, bsd.Area, [(bsd.SearchName, bsd.SpawnType)]);
     }
 
-    private static IEnumerable<SpawnerData> GetSpawnersFromPath(Transform activeBiome, Biome.BiomeType biomeType, string path, BiomeArea area, List<(string searcName, SpawnType spawnType)> spawnersToSearch)
+    private static IEnumerable<SpawnerData> GetSpawnersFromPath(Transform activeBiome, OurBiome biomeType, string path, BiomeArea area, List<(string searcName, SpawnType spawnType)> spawnersToSearch)
     {
         var parent = activeBiome.Find(path);
         if (parent == null)
@@ -78,12 +78,12 @@ public static class SpawnerFinderAndInit
             }
         }
     }
-    
-    public static SpawnerData? GetSpawnerFromObject(GameObject go, Biome.BiomeType biomeType, BiomeArea area, SpawnType spawnType)
+
+    public static SpawnerData? GetSpawnerFromObject(GameObject go, OurBiome biomeType, BiomeArea area, SpawnType spawnType)
     {
         var comp = go.GetComponent<PropSpawner>();
         if (comp == null || comp.props.Length == 0) return null;
-        
+
         return new SpawnerData(comp, comp.props[0], biomeType, area, spawnType);
     }
 }

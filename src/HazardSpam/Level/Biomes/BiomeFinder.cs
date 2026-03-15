@@ -5,12 +5,12 @@ namespace HazardSpam.Level.Biomes;
 
 public static class BiomeFinder
 {
-    
-    public static BiomeInfo? FindActiveBiome(Biome.BiomeType biomeType)
+
+    public static BiomeInfo? FindActiveBiome(OurBiome biomeType)
     {
         switch (biomeType)
         {
-            case Biome.BiomeType.Shore:
+            case OurBiome.Shore:
             {
                 var go = GameObject.Find("Map/Biome_1/Beach/Beach_Segment");
 
@@ -20,7 +20,7 @@ public static class BiomeFinder
                     return null;
                 }
 
-                var variant = 
+                var variant =
                     DetermineBiomeVariant(System.Enum.GetNames(typeof(BiomeShoreVariants)), go.transform);
 
                 if (variant == null)
@@ -28,36 +28,36 @@ public static class BiomeFinder
                     Plugin.Log.LogError($"Could not find biome variant for Shore");
                     return null;
                 }
-                
+
                 return new BiomeInfo(biomeType, variant.name, go.transform, variant);
             }
 
-            case Biome.BiomeType.Tropics:
+            case OurBiome.Tropics:
             {
-                var go = GameObject.Find("Map/Biome_2/Jungle/Jungle_Segment");
-                
+                var go = GameObject.Find("Map/Biome_2/Tropics/Jungle_Segment");
+
                 if (go == null)
                 {
                     Plugin.Log.LogError($"Could not find Jungle_Segment for Tropics");
                     return null;
                 }
 
-                var variant = 
+                var variant =
                     DetermineBiomeVariant(System.Enum.GetNames(typeof(BiomeTropicVariants)), go.transform);
-                
+
                 if (variant == null)
                 {
                     Plugin.Log.LogError($"Could not find biome variant for Tropics");
                     return null;
                 }
-                
+
                 return new BiomeInfo(biomeType, variant.name, go.transform, variant);
             }
 
-            case Biome.BiomeType.Alpine:
+            case OurBiome.Alpine:
             {
-                var go = GameObject.Find("Map/Biome_3/Snow/Snow_Segment");
-                
+                var go = GameObject.Find("Map/Biome_3/Alpine/Snow_Segment");
+
                 if (go == null)
                 {
                     Plugin.Log.LogError($"Could not find Snow_Segment for Alpine");
@@ -66,33 +66,33 @@ public static class BiomeFinder
 
                 var variant =
                     DetermineBiomeVariant(System.Enum.GetNames(typeof(BiomeAlpineVariants)), go.transform);
-                
+
                 if (variant == null)
                 {
                     Plugin.Log.LogError($"Could not find biome variant for Alpine");
                     return null;
                 }
-                
+
                 return new BiomeInfo(biomeType, variant.name, go.transform, variant);
             }
 
-            case Biome.BiomeType.Mesa:
+            case OurBiome.Mesa:
             {
-                var go = GameObject.Find("Map/Biome_3/Desert/Desert_Segment");
-                
+                var go = GameObject.Find("Map/Biome_3/Mesa/Desert_Segment");
+
                 if (go == null)
                 {
                     Plugin.Log.LogError($"Could not find Desert_Segment for Mesa");
                     return null;
                 }
-                
+
                 return new BiomeInfo(biomeType, "", go.transform, go.transform);
             }
         }
 
         return null;
     }
-    
+
     private static Transform? DetermineBiomeVariant(string[] variants, Transform segment)
     {
         foreach (string variant in variants)
@@ -104,7 +104,7 @@ public static class BiomeFinder
                 Plugin.Log.LogWarning($"Biome variant '{variant}' is null");
                 continue;
             }
-            
+
             if (go.gameObject.activeSelf)
             {
                 Plugin.Log.LogInfo($"Found biome variant '{variant}'");

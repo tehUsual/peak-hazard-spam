@@ -10,7 +10,7 @@ public static class LevelChangePatches
 {
     public static bool PatchSuccessfull { get; private set; }
     public static AirportCheckInKiosk AirportCheckInKioskInstance { get; private set; } = null!;
-    
+
 
     // Get an instance of the Maphandler
     [HarmonyPatch(typeof(MapHandler), "Awake")]
@@ -28,10 +28,10 @@ public static class LevelChangePatches
     public static void PrefixBeginIslandLoadRPC(AirportCheckInKiosk __instance)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        
+
         Plugin.Log.LogInfo("[AirportCheckInKiosk.BeginIslandLoadRPC] LOADING SHORE");
         AirportCheckInKioskInstance = __instance;
-        LevelState.SetBiomeComplete(Biome.BiomeType.Shore);
+        LevelState.SetBiomeComplete(OurBiome.Shore);
     }
 
     // Detect beach loaded
@@ -45,21 +45,21 @@ public static class LevelChangePatches
         if (SceneManager.GetActiveScene().name.StartsWith("Level_"))
         {
             Plugin.Log.LogInfo("[RunManager.Start] LOADED SHORE");
-            LevelState.SetBiomeComplete(Biome.BiomeType.Shore);    
+            LevelState.SetBiomeComplete(OurBiome.Shore);
         }
         else
         {
             SceneManager.sceneLoaded += OnLevelSceneLoaded;
         }
     }
-    
+
     #pragma warning disable Harmony003
     private static void OnLevelSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (!scene.name.StartsWith("Level_")) return;
-        
+
         Plugin.Log.LogInfo("[RunManager.Start] LOADED SHORE");
-        LevelState.SetBiomeComplete(Biome.BiomeType.Shore);
+        LevelState.SetBiomeComplete(OurBiome.Shore);
         SceneManager.sceneLoaded -= OnLevelSceneLoaded;
     }
     #pragma warning restore Harmony003
