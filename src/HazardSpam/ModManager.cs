@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using ConsoleTools;
 using HazardSpam.Hazards;
 using HazardSpam.Networking;
@@ -17,16 +19,17 @@ public static class ModManager
     internal static void Awake()
     {
         InitNetworkObjects();
-        
+
         // === Callbacks
         GameStateEvents.OnRunStartLoading += OnRunStartLoading;
         GameStateEvents.OnRunStartLoadComplete += OnRunStartLoadComplete;
 
         GameStateEvents.OnAllPlayersReady += OnAllPlayersReady;
+        GameStateEvents.OnRunStartedAndPlayersReady += OnRunStartedAndPlayersReady;
 
         SegmentManager.OnSegmentLoading += OnSegmentLoading;
         SegmentManager.OnSegmentLoadComplete += OnSegmentLoadComplete;
-        
+
         GameStateEvents.OnAirportLoaded += OnAirportLoaded;
         GameStateEvents.OnSelfLeaveLobby += OnSelfLeaveLobby;
     }
@@ -37,13 +40,14 @@ public static class ModManager
         GameStateEvents.OnRunStartLoadComplete -= OnRunStartLoadComplete;
 
         GameStateEvents.OnAllPlayersReady -= OnAllPlayersReady;
+        GameStateEvents.OnRunStartedAndPlayersReady -= OnRunStartedAndPlayersReady;
 
         SegmentManager.OnSegmentLoading -= OnSegmentLoading;
         SegmentManager.OnSegmentLoadComplete -= OnSegmentLoadComplete;
-        
+
         GameStateEvents.OnAirportLoaded -= OnAirportLoaded;
         GameStateEvents.OnSelfLeaveLobby -= OnSelfLeaveLobby;
-        
+
         CleanupSpawners();
         CleanupNetwork();
     }
@@ -60,13 +64,13 @@ public static class ModManager
         go.AddComponent<PlayerReadyTracker>();
         go.AddComponent<PhotonCallbacks>();
         go.AddComponent<PhotonView>();
-        
+
         var pv = go.GetComponent<PhotonView>();
         pv.ViewID = Plugin.HazardSpamViewID;
-        
+
         go.AddComponent<NetComm>();
     }
-    
+
     private static void CleanupNetwork()
     {
         var go = GameObject.Find("HazardSpamNetwork");
@@ -76,7 +80,7 @@ public static class ModManager
             Plugin.DestroyGameObject(go);
         }
     }
-    
+
     private static void CleanupSpawners()
     {
         HazardTemplateManager.Reset();
@@ -98,41 +102,71 @@ public static class ModManager
         Plugin.Log.LogColor("Left lobby, cleaning spawners");
         CleanupSpawners();
     }
-    
+
 
     // ============================================================================
     //  Callbacks - Run start
     // ============================================================================
     private static void OnRunStartLoading(string sceneName, int ascent)
     {
-        
     }
 
     private static void OnAllPlayersReady()
     {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
         //NetComm.Instance.StartCoroutine(SpawnTests.InitializeRunTypeTest());
-        NetComm.Instance.StartCoroutine(SpawnTests.InitializeRunSegmentTest());
+        //NetComm.Instance.StartCoroutine(SpawnTests.InitializeRunSegmentTest());
     }
 
     private static void OnRunStartLoadComplete(string sceneName, int ascent)
     {
+        // Everyone
+        HazardTemplateManager.LoadSceneData();
+    }
+
+    private static void OnRunStartedAndPlayersReady()
+    {
+        Plugin.Log.LogColor("Run started and all players are ready");
+        // Master only
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        NetComm.Instance.StartCoroutine(LoadRun());
+    }
+
+    private static IEnumerator LoadRun()
+    {
+        Plugin.Log.LogColor("Waiting to load run..");
+        yield return new WaitForSeconds(3f);            // ensure all players have loaded their spawner prefabs
+
+        Plugin.Log.LogColor("Loading run");
+        HazardManager.CreateSpawnersFromConfigOverNetwork();
+        Plugin.Log.LogColor("Spawners created");
+        
+        yield return new WaitForSeconds(3f);
+        
+        Plugin.Log.LogColor("Loading zone");
+        yield return HazardManager.LoadZone(Zone.Shore);
         
     }
-    
-    // ============================================================================
+
+// ============================================================================
     //  Callbacks - Segments
     // ============================================================================
     private static void OnSegmentLoading(SegmentManager.SegmentInfo fromSegment, SegmentManager.SegmentInfo toSegment)
     {
-        Plugin.Log.LogColor($"FROM: {fromSegment.Chapter.ToString()}/{fromSegment.Zone.ToString()}/{fromSegment.SubZone.ToString()} - TO: {toSegment.Chapter.ToString()}/{toSegment.Zone.ToString()}/{toSegment.SubZone.ToString()}");
+        if (!PhotonNetwork.IsMasterClient)
+            return;
         
+        Plugin.Log.LogColor($"FROM: {fromSegment.Chapter.ToString()}/{fromSegment.Zone.ToString()}/{fromSegment.SubZone.ToString()} - TO: {toSegment.Chapter.ToString()}/{toSegment.Zone.ToString()}/{toSegment.SubZone.ToString()}");
         Plugin.Log.LogColor($"Segment loading: {fromSegment.Zone} -> {toSegment.Zone}");
         
         if (fromSegment.Zone == Zone.Unknown)
             return;
         
-        Plugin.Log.LogColor($"Unloading zone {fromSegment.Zone}");
-        NetComm.Instance.RemoveSpawnersNetwork(fromSegment.Zone);
+        HazardManager.UnloadZone(fromSegment.Zone);
     }
     
     private static void OnSegmentLoadComplete(SegmentManager.SegmentInfo segment)
@@ -144,7 +178,8 @@ public static class ModManager
         
         if (segment.Zone == Zone.Shore)
             return;
-        
-        NetComm.Instance.StartCoroutine(SpawnTests.LoadZone(segment.Zone));
+
+        NetComm.Instance.StartCoroutine(HazardManager.LoadZone(segment.Zone));
+        //NetComm.Instance.StartCoroutine(SpawnTests.LoadZone(segment.Zone));
     }
 }

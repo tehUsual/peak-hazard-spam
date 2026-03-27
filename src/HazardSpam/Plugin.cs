@@ -6,6 +6,7 @@ using ConsoleTools.Patches;
 using HarmonyLib;
 using HazardSpam.Config;
 using HazardSpam.Hazards;
+using HazardSpam.Menu;
 using HazardSpam.Networking;
 using HazardSpam.Tests;
 using NetGameState.Events;
@@ -26,9 +27,12 @@ public partial class Plugin : BaseUnityPlugin
 {
     internal static ManualLogSource Log { get; private set; } = null!;
     internal static Plugin Instance { get; private set; } = null!;
+    
+    private MenuHandler _menuHandler = null!;
 
     internal static readonly bool Debug = true;
-    internal static readonly bool DebugFull = false;
+    internal static readonly bool DebugFull = true;
+    internal static readonly bool DebugMenu = false;
     
     internal const int HazardSpamViewID = 9989;
     private const string CompatibleVersion = "1.29.a";
@@ -83,6 +87,10 @@ public partial class Plugin : BaseUnityPlugin
         ModManager.Awake();
         HazardTemplateManager.Initialize();
         
+        // === Menu
+        _menuHandler = new MenuHandler();
+        _menuHandler.Initialize();
+        
         Log.LogInfo($"Plugin {Name} load complete!");
     }
     
@@ -98,8 +106,16 @@ public partial class Plugin : BaseUnityPlugin
         // Master only
         if (PhotonNetwork.IsMasterClient)
         {
-            SpawnTests.Update();
+            // Menu
+            if (Input.GetKeyDown(KeyCode.Delete) && GameStateEvents.IsInAirport)
+            {
+                _menuHandler.Toggle();
+            }
+            
+            // Spawn tests
+            //SpawnTests.Update();
 
+            // Utility
             if (Input.GetKey(KeyCode.LeftAlt))
             {
                 if (GameStateEvents.IsRunActive)
@@ -108,7 +124,7 @@ public partial class Plugin : BaseUnityPlugin
                     if (Input.GetKeyDown(KeyCode.Keypad1))
                         TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.Shore);
                     if (Input.GetKeyDown(KeyCode.Keypad2))
-                        TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.Tropics);
+                        TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.TropicsRoots);
                     if (Input.GetKeyDown(KeyCode.Keypad3))
                         TeleportHandler.TeleportToCampfire(NetGameState.Util.Campfire.AlpineMesa);
                     if (Input.GetKeyDown(KeyCode.Keypad4))
@@ -141,6 +157,11 @@ public partial class Plugin : BaseUnityPlugin
     internal static void DestroyGameObject(GameObject go)
     {
         Destroy(go);
+    }
+    
+    public void UpdateSidebarTabCount(string biomeName, int totalHazards)
+    {
+        _menuHandler.UpdateSidebarTabCount(biomeName, totalHazards);
     }
 
 }

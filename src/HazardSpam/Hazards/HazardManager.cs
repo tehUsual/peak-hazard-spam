@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using ConsoleTools;
 using HazardSpam.Helpers;
+using HazardSpam.Menu.Settings;
 using HazardSpam.Networking;
+using HazardSpam.Spawning;
 using HazardSpam.Types;
 using NetGameState.Level;
 using Photon.Pun;
@@ -89,6 +91,23 @@ public static class HazardManager
         return $"{area.ToString()}_{type.ToString()}";
     }
 
+    internal static void CreateSpawnersFromConfigOverNetwork()
+    {
+        List<SpawnIdentifierNet> spawnerNetIds = [];
+        
+        List<HazardData> allHazards = MenuSettings.GetAllHazards();
+        foreach (var hazard in allHazards)
+        {
+            if (TryCreateSpawnerData(hazard.Zone, hazard.SubZoneArea, hazard.hazardType, out var spawnerDataNet))
+            {
+                spawnerNetIds.Add(spawnerDataNet);
+            }
+        }
+        
+        if (spawnerNetIds.Count > 0)
+            NetComm.Instance.CreateMultipleSpawnersNetwork(spawnerNetIds.ToArray());
+    }
+
     internal static void CreateSpawner(Zone zone, SubZoneArea area, HazardType hazardType, int viewID)
     {
         if (!HazardTemplateManager.PropPrefabs.TryGetValue(hazardType, out var propSpawnerPrefab))
@@ -156,7 +175,53 @@ public static class HazardManager
         // Add to registry
         ActiveSpawners[(zone, area, hazardType)] = spawnerGo;
     }
-    
+
+    internal static void UnloadZone(Zone zoneToUnload)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        
+        Plugin.Log.LogColor($"Unloading zone {zoneToUnload}");
+        NetComm.Instance.RemoveSpawnersNetwork(zoneToUnload);
+    }
+
+    internal static IEnumerator LoadZone(Zone zoneToLoad)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            yield break;
+        
+        Plugin.Log.LogColor($"Loading zone {zoneToLoad}");
+        
+        Dictionary<(SubZoneArea, HazardType), HazardSettings> hazards = MenuSettings.GetHazardsForZone(zoneToLoad);
+        foreach (var ((area, type), hazardSettings) in hazards) {
+            if (ActiveSpawners.TryGetValue((zoneToLoad, area, type), out var spawnerGo))
+            {
+                var propSpawner = spawnerGo.GetComponent<PropSpawner>();
+                if (ReferenceEquals(propSpawner, null))
+                {
+                    Plugin.Log.LogColorW($"Could not find prop spawner for {zoneToLoad.ToString()}/{area.ToString()}/{type.ToString()}");
+                    continue;
+                }
+
+                var (positions, rotations) = SpawnerLogic.GenerateSpawnPoints(propSpawner, hazardSettings.Amount);
+                Plugin.Log.LogColor($"Generated {positions.Length} positions out of {hazardSettings.Amount}");
+                if (positions.Length == 0)
+                {
+                    yield return null;
+                    continue;
+                }
+                
+                NetComm.Instance.SpawnHazardsNetwork(zoneToLoad, area, type, positions, rotations);
+                yield return new WaitForSeconds(0.33f);
+            }
+            else
+            {
+                Plugin.Log.LogColorW($"Spawner for {zoneToLoad.ToString()}/{area.ToString()}/{type.ToString()} is null");
+                continue;
+            }
+        }
+    }
+
     internal static IEnumerator SpawnPropsRoutine(Zone zone, SubZoneArea area, HazardType type, Vector3[] positions, Quaternion[] rotations)
     {
         string id = Helper.GenSpawnID(zone, area, type);

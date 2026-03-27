@@ -4,6 +4,7 @@ using ConsoleTools;
 using HazardSpam.Types;
 using NetGameState.Level;
 using UnityEngine;
+using NetGameState.LevelStructure;
 
 namespace HazardSpam.Hazards;
 
@@ -16,12 +17,12 @@ public static class HazardTemplateManager
 
     internal static readonly Dictionary<Zone, Transform> BiomeSpawnerRoots = [];
 
-    private const string SegBeach = "Map/Biome_1/Beach/Beach_Segment";
+    /*private const string SegBeach = "Map/Biome_1/Beach/Beach_Segment";
     private const string SegTropics = "Map/Biome_2/Jungle/Jungle_Segment";
     private const string SegAlpine = "Map/Biome_3/Snow/Snow_Segment";
     private const string SegMesa = "Map/Biome_3/Desert/Desert_Segment";
     private const string SegCaldera = "Map/Biome_4/Volcano/Caldera_Segment";
-    private const string SegKiln = "Map/Biome_4/Volcano/Volcano_Segment";
+    private const string SegKiln = "Map/Biome_4/Volcano/Volcano_Segment";*/
     
 
     internal static void Reset()
@@ -39,40 +40,40 @@ public static class HazardTemplateManager
     private static void InitializePaths()
     {
         // Shore
-        Paths[(Zone.Shore, SubZoneArea.Plateau, HazardType.Urchin)] = $"{SegBeach}/Default/PlateauProps/Urchins";
-        Paths[(Zone.Shore, SubZoneArea.Plateau, HazardType.Jelly)] = $"{SegBeach}/Default/PlateauProps/Jellies";
-        Paths[(Zone.Shore, SubZoneArea.Wall, HazardType.Urchin)] = $"{SegBeach}/Default/WallProps/Urchins";
-        Paths[(Zone.Shore, SubZoneArea.Wall, HazardType.Jelly)] = $"{SegBeach}/Default/WallProps/Jellies";
+        Paths[(Zone.Shore, SubZoneArea.Plateau, HazardType.Urchin)] = $"{MapObjectPaths.SegShore}/Default/PlateauProps/Urchins";
+        Paths[(Zone.Shore, SubZoneArea.Plateau, HazardType.Jelly)] = $"{MapObjectPaths.SegShore}/Default/PlateauProps/Jellies";
+        Paths[(Zone.Shore, SubZoneArea.Wall, HazardType.Urchin)] = $"{MapObjectPaths.SegShore}/Default/WallProps/Urchins";
+        Paths[(Zone.Shore, SubZoneArea.Wall, HazardType.Jelly)] = $"{MapObjectPaths.SegShore}/Default/WallProps/Jellies";
         
         // Tropics
-        Paths[(Zone.Tropics, SubZoneArea.Plateau, HazardType.Thorn)] = $"{SegTropics}/Thorny/Pops_Plat/Thorns";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.PoisonIvy)] = $"{SegTropics}/Default/Props_Wall/Ivy";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.ExploSpore)] = $"{SegTropics}/Default/Props_Wall/ExploShrooms";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.PoisonSpore)] = $"{SegTropics}/Default/Props_Wall/PoisonShrooms";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.Thorn)] = $"{SegTropics}/Thorny/Props_Wall/Thorns";
-        //Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.NiceThorn)] = $"{SegTropics}/Thorny/Props_Wall/NiceThorns";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.BigThorn)] = $"{SegTropics}/Thorny/Props_Wall/BigThorns";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.Beehive)] = $"{SegTropics}/Default/Props_Wall/Behive";
-        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.LavaRiver)] = $"{SegTropics}/Lava/LavaRivers";
+        Paths[(Zone.Tropics, SubZoneArea.Plateau, HazardType.Thorn)] = $"{MapObjectPaths.SegTropics}/Thorny/Pops_Plat/Thorns";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.PoisonIvy)] = $"{MapObjectPaths.SegTropics}/Default/Props_Wall/Ivy";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.ExploSpore)] = $"{MapObjectPaths.SegTropics}/Default/Props_Wall/ExploShrooms";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.PoisonSpore)] = $"{MapObjectPaths.SegTropics}/Default/Props_Wall/PoisonShrooms";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.Thorn)] = $"{MapObjectPaths.SegTropics}/Thorny/Props_Wall/Thorns";
+        //Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.NiceThorn)] = $"{MapObjectPaths.SegTropics}/Thorny/Props_Wall/NiceThorns";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.BigThorn)] = $"{MapObjectPaths.SegTropics}/Thorny/Props_Wall/BigThorns";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.Beehive)] = $"{MapObjectPaths.SegTropics}/Default/Props_Wall/Behive";
+        Paths[(Zone.Tropics, SubZoneArea.Wall, HazardType.LavaRiver)] = $"{MapObjectPaths.SegTropics}/Lava/LavaRivers";
 
         // Alpine
-        Paths[(Zone.Alpine, SubZoneArea.Plateau, HazardType.Geyser)] = $"{SegAlpine}/GeyserHell/PlateauProps/Geysers";
-        Paths[(Zone.Alpine, SubZoneArea.Wall, HazardType.LavaRiver)] = $"{SegAlpine}/Lava/LavaRivers";
-        Paths[(Zone.Alpine, SubZoneArea.WallLeft, HazardType.Geyser)] = $"{SegAlpine}/*/Rocks/IceRockSpawn_L/Geysers";
-        Paths[(Zone.Alpine, SubZoneArea.WallLeft, HazardType.FlashPlant)] = $"{SegAlpine}/*/Rocks/IceRockSpawn_L/FlashPlant";
-        Paths[(Zone.Alpine, SubZoneArea.WallRight, HazardType.Geyser)] = $"{SegAlpine}/*/Rocks/IceRockSpawn_R/Geysers";
-        Paths[(Zone.Alpine, SubZoneArea.WallRight, HazardType.FlashPlant)] = $"{SegAlpine}/*/Rocks/IceRockSpawn_R/FlashPlant";
+        Paths[(Zone.Alpine, SubZoneArea.Plateau, HazardType.Geyser)] = $"{MapObjectPaths.SegAlpine}/GeyserHell/PlateauProps/Geysers";
+        Paths[(Zone.Alpine, SubZoneArea.Wall, HazardType.LavaRiver)] = $"{MapObjectPaths.SegAlpine}/Lava/LavaRivers";
+        Paths[(Zone.Alpine, SubZoneArea.WallLeft, HazardType.Geyser)] = $"{MapObjectPaths.SegAlpine}/*/Rocks/IceRockSpawn_L/Geysers";
+        Paths[(Zone.Alpine, SubZoneArea.WallLeft, HazardType.FlashPlant)] = $"{MapObjectPaths.SegAlpine}/*/Rocks/IceRockSpawn_L/FlashPlant";
+        Paths[(Zone.Alpine, SubZoneArea.WallRight, HazardType.Geyser)] = $"{MapObjectPaths.SegAlpine}/*/Rocks/IceRockSpawn_R/Geysers";
+        Paths[(Zone.Alpine, SubZoneArea.WallRight, HazardType.FlashPlant)] = $"{MapObjectPaths.SegAlpine}/*/Rocks/IceRockSpawn_R/FlashPlant";
         
         // Mesa
-        Paths[(Zone.Mesa, SubZoneArea.Plateau, HazardType.Cactus)] = $"{SegMesa}/Platteau/Props/Cactus";
-        Paths[(Zone.Mesa, SubZoneArea.Plateau, HazardType.CactusBall)] = $"{SegMesa}/Platteau/Props/Cactus_Balls (1)";
-        Paths[(Zone.Mesa, SubZoneArea.Plateau, HazardType.CactusBig)] = $"{SegMesa}/Platteau/Props/Cactus_Big";
+        Paths[(Zone.Mesa, SubZoneArea.Plateau, HazardType.Cactus)] = $"{MapObjectPaths.SegMesa}/Platteau/Props/Cactus";
+        Paths[(Zone.Mesa, SubZoneArea.Plateau, HazardType.CactusBall)] = $"{MapObjectPaths.SegMesa}/Platteau/Props/Cactus_Balls (1)";
+        Paths[(Zone.Mesa, SubZoneArea.Plateau, HazardType.CactusBig)] = $"{MapObjectPaths.SegMesa}/Platteau/Props/Cactus_Big";
 
-        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.Cactus)] = $"{SegMesa}/Wall/Props/Cactus";
-        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.CactusBall)] = $"{SegMesa}/Wall/Props/Cactus_Balls";
-        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.CactusBig)] = $"{SegMesa}/Wall/Props/Cactus_Big";
-        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.Dynamite)] = $"{SegMesa}/Wall/Props/Dynamite";
-        //Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.DynamiteOutside)] = $"{SegMesa}/Wall/Props/Dynamite_Outside";
+        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.Cactus)] = $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus";
+        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.CactusBall)] = $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus_Balls";
+        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.CactusBig)] = $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus_Big";
+        Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.Dynamite)] = $"{MapObjectPaths.SegMesa}/Wall/Props/Dynamite";
+        //Paths[(Zone.Mesa, SubZoneArea.Wall, HazardType.DynamiteOutside)] = $"{MapObjectPaths.SegMesa}/Wall/Props/Dynamite_Outside";
 
         // Caldera
         //Paths[(Zone.Caldera, SubZoneArea.Plateau, SpawnType.Egg)] = $"{SegCaldera}/Props/Eggs";
@@ -102,46 +103,46 @@ public static class HazardTemplateManager
     private static void LoadPrefabs()
     {
         // Shore
-        LoadPropPrefabs(HazardType.Urchin, $"{SegBeach}/Default/PlateauProps/Urchins");
-        LoadPropPrefabs(HazardType.Jelly, $"{SegBeach}/Default/PlateauProps/Jellies");
+        LoadPropPrefabs(HazardType.Urchin, $"{MapObjectPaths.SegShore}/Default/PlateauProps/Urchins");
+        LoadPropPrefabs(HazardType.Jelly, $"{MapObjectPaths.SegShore}/Default/PlateauProps/Jellies");
         // Tropics
-        LoadPropPrefabs(HazardType.PoisonIvy, $"{SegTropics}/Default/Props_Wall/Ivy");
-        LoadPropPrefabs(HazardType.ExploSpore, $"{SegTropics}/Default/Props_Wall/ExploShrooms");
-        LoadPropPrefabs(HazardType.PoisonSpore, $"{SegTropics}/Default/Props_Wall/PoisonShrooms");
-        LoadPropPrefabs(HazardType.Thorn, $"{SegTropics}/Thorny/Props_Wall/Thorns");
-        LoadPropPrefabs(HazardType.BigThorn, $"{SegTropics}/Thorny/Props_Wall/BigThorns");
-        LoadPropPrefabs(HazardType.Beehive, $"{SegTropics}/Default/Props_Wall/Behive");
-        LoadPropPrefabs(HazardType.LavaRiver, $"{SegTropics}/Lava/LavaRivers");
+        LoadPropPrefabs(HazardType.PoisonIvy, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/Ivy");
+        LoadPropPrefabs(HazardType.ExploSpore, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/ExploShrooms");
+        LoadPropPrefabs(HazardType.PoisonSpore, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/PoisonShrooms");
+        LoadPropPrefabs(HazardType.Thorn, $"{MapObjectPaths.SegTropics}/Thorny/Props_Wall/Thorns");
+        LoadPropPrefabs(HazardType.BigThorn, $"{MapObjectPaths.SegTropics}/Thorny/Props_Wall/BigThorns");
+        LoadPropPrefabs(HazardType.Beehive, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/Behive");
+        LoadPropPrefabs(HazardType.LavaRiver, $"{MapObjectPaths.SegTropics}/Lava/LavaRivers");
         // Alpine
-        LoadPropPrefabs(HazardType.Geyser, $"{SegAlpine}/GeyserHell/PlateauProps/Geysers");
-        LoadPropPrefabs(HazardType.FlashPlant, $"{SegAlpine}/Default/Rocks/IceRockSpawn_L/FlashPlant");
+        LoadPropPrefabs(HazardType.Geyser, $"{MapObjectPaths.SegAlpine}/GeyserHell/PlateauProps/Geysers");
+        LoadPropPrefabs(HazardType.FlashPlant, $"{MapObjectPaths.SegAlpine}/Default/Rocks/IceRockSpawn_L/FlashPlant");
         // Mesa
-        LoadPropPrefabs(HazardType.Cactus, $"{SegMesa}/Platteau/Props/Cactus");
-        LoadPropPrefabs(HazardType.CactusBall, $"{SegMesa}/Wall/Props/Cactus_Balls");
-        LoadPropPrefabs(HazardType.CactusBig, $"{SegMesa}/Wall/Props/Cactus_Big");
-        LoadPropPrefabs(HazardType.Dynamite, $"{SegMesa}/Wall/Props/Dynamite");
+        LoadPropPrefabs(HazardType.Cactus, $"{MapObjectPaths.SegMesa}/Platteau/Props/Cactus");
+        LoadPropPrefabs(HazardType.CactusBall, $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus_Balls");
+        LoadPropPrefabs(HazardType.CactusBig, $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus_Big");
+        LoadPropPrefabs(HazardType.Dynamite, $"{MapObjectPaths.SegMesa}/Wall/Props/Dynamite");
     }
 
     private static void LoadAreas()
     {
         // Shore 
-        LoadPropSpawnerForArea(Zone.Shore, SubZoneArea.Plateau, $"{SegBeach}/Default/PlateauProps/Jellies");
-        LoadPropSpawnerForArea(Zone.Shore, SubZoneArea.Wall, $"{SegBeach}/Default/WallProps/Jellies");
+        LoadPropSpawnerForArea(Zone.Shore, SubZoneArea.Plateau, $"{MapObjectPaths.SegShore}/Default/PlateauProps/Jellies");
+        LoadPropSpawnerForArea(Zone.Shore, SubZoneArea.Wall, $"{MapObjectPaths.SegShore}/Default/WallProps/Jellies");
         // Tropics
-        LoadPropSpawnerForArea(Zone.Tropics, SubZoneArea.Plateau, $"{SegTropics}/Default/Pops_Plat/Bushes");
-        LoadPropSpawnerForArea(Zone.Tropics, SubZoneArea.Wall, $"{SegTropics}/Default/Props_Wall/ExploShrooms");
+        LoadPropSpawnerForArea(Zone.Tropics, SubZoneArea.Plateau, $"{MapObjectPaths.SegTropics}/Default/Pops_Plat/Bushes");
+        LoadPropSpawnerForArea(Zone.Tropics, SubZoneArea.Wall, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/ExploShrooms");
         // Alpine
-        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.Plateau, $"{SegAlpine}/GeyserHell/PlateauProps/Geysers");
-        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.Wall, $"{SegAlpine}/Lava/LavaRivers");
-        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.WallLeft, $"{SegAlpine}/Default/Rocks/IceRockSpawn_L/Geysers");
-        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.WallRight, $"{SegAlpine}/Default/Rocks/IceRockSpawn_R/Geysers");
+        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.Plateau, $"{MapObjectPaths.SegAlpine}/GeyserHell/PlateauProps/Geysers");
+        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.Wall, $"{MapObjectPaths.SegAlpine}/Lava/LavaRivers");
+        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.WallLeft, $"{MapObjectPaths.SegAlpine}/Default/Rocks/IceRockSpawn_L/Geysers");
+        LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.WallRight, $"{MapObjectPaths.SegAlpine}/Default/Rocks/IceRockSpawn_R/Geysers");
         // Mesa
-        LoadPropSpawnerForArea(Zone.Mesa, SubZoneArea.Plateau, $"{SegMesa}/Platteau/Props/Cactus");
-        LoadPropSpawnerForArea(Zone.Mesa, SubZoneArea.Wall, $"{SegMesa}/Wall/Props/Cactus_Balls");
+        LoadPropSpawnerForArea(Zone.Mesa, SubZoneArea.Plateau, $"{MapObjectPaths.SegMesa}/Platteau/Props/Cactus");
+        LoadPropSpawnerForArea(Zone.Mesa, SubZoneArea.Wall, $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus_Balls");
         // Caldera
-        LoadPropSpawnerForArea(Zone.Caldera, SubZoneArea.Plateau, $"{SegCaldera}/Props/Eggs");
+        LoadPropSpawnerForArea(Zone.Caldera, SubZoneArea.Plateau, $"{MapObjectPaths.SegCaldera}/Props/Eggs");
         // Volcano
-        LoadPropSpawnerForArea(Zone.Kiln, SubZoneArea.Wall, $"{SegKiln}/Props/LuggageSpawnerLine");     // PropSpawner_Line
+        LoadPropSpawnerForArea(Zone.Kiln, SubZoneArea.Wall, $"{MapObjectPaths.SegKiln}/Props/LuggageSpawnerLine");     // TODO: PropSpawner_Line
     }
 
     private static void LoadPropSpawnerForArea(Zone zone, SubZoneArea subZoneArea, string path)
