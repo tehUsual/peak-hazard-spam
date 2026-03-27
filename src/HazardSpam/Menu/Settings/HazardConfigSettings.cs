@@ -39,16 +39,19 @@ public class HazardConfigData
 /// </summary>
 public static class HazardConfigSettings
 {
-    public static readonly Dictionary<HazardType, Dictionary<string, object>> _configs = new();
+    public static readonly Dictionary<HazardType, Dictionary<string, object>> Configs = new();
     
     /// <summary>
     /// Get a configurable value for a field
     /// </summary>
-    public static T GetValue<T>(string fieldName, T defaultValue = default!)
+    public static T GetValue<T>(HazardType type, string fieldName, T defaultValue = default!)
     {
         // Find the SpawnType that has this field
-        var descriptor = SpawnTypeDescriptors.GetAll().FirstOrDefault(d => d.Fields.Any(f => f.Name == fieldName));
-        if (descriptor != null && _configs.TryGetValue(descriptor.Type, out var typeConfig))
+        var descriptor = SpawnTypeDescriptors.GetAll()
+            .FirstOrDefault(d =>
+                d.Type == type &&
+                d.Fields.Any(f => f.Name == fieldName));
+        if (descriptor != null && Configs.TryGetValue(descriptor.Type, out var typeConfig))
         {
             if (typeConfig.TryGetValue(fieldName, out var value))
             {
@@ -75,12 +78,12 @@ public static class HazardConfigSettings
         var descriptor = SpawnTypeDescriptors.GetAll().FirstOrDefault(d => d.Fields.Any(f => f.Name == fieldName));
         if (descriptor != null)
         {
-            if (!_configs.ContainsKey(descriptor.Type))
+            if (!Configs.ContainsKey(descriptor.Type))
             {
-                _configs[descriptor.Type] = new Dictionary<string, object>();
+                Configs[descriptor.Type] = new Dictionary<string, object>();
             }
             
-            _configs[descriptor.Type][fieldName] = value;
+            Configs[descriptor.Type][fieldName] = value;
             SaveSettings();
         }
     }
@@ -90,7 +93,7 @@ public static class HazardConfigSettings
     /// </summary>
     public static Dictionary<string, object> GetTypeConfig(HazardType type)
     {
-        return _configs.TryGetValue(type, out var config) ? config : new Dictionary<string, object>();
+        return Configs.TryGetValue(type, out var config) ? config : new Dictionary<string, object>();
     }
     
     /// <summary>
@@ -101,10 +104,10 @@ public static class HazardConfigSettings
         var descriptor = SpawnTypeDescriptors.GetByType(type);
         if (descriptor != null)
         {
-            _configs[type] = new Dictionary<string, object>();
+            Configs[type] = new Dictionary<string, object>();
             foreach (var field in descriptor.Fields)
             {
-                _configs[type][field.Name] = field.DefaultValue;
+                Configs[type][field.Name] = field.DefaultValue;
             }
             SaveSettings();
         }
@@ -115,13 +118,13 @@ public static class HazardConfigSettings
     /// </summary>
     public static void ResetAllToDefaults()
     {
-        _configs.Clear();
+        Configs.Clear();
         foreach (var descriptor in SpawnTypeDescriptors.GetConfigurableTypes())
         {
-            _configs[descriptor.Type] = new Dictionary<string, object>();
+            Configs[descriptor.Type] = new Dictionary<string, object>();
             foreach (var field in descriptor.Fields)
             {
-                _configs[descriptor.Type][field.Name] = field.DefaultValue;
+                Configs[descriptor.Type][field.Name] = field.DefaultValue;
             }
         }
         SaveSettings();
@@ -169,7 +172,7 @@ public static class HazardConfigSettings
             }
             
             // Convert from serializable format back to internal format
-            _configs.Clear();
+            Configs.Clear();
             foreach (var config in parsedData)
             {
                 if (Enum.TryParse<HazardType>(config.Type, out var spawnType))
@@ -188,12 +191,12 @@ public static class HazardConfigSettings
                         
                         values[field.Name] = value;
                     }
-                    _configs[spawnType] = values;
+                    Configs[spawnType] = values;
                 }
             }
             
             if (Plugin.DebugMenu)
-                Plugin.Log.LogInfo($"Successfully loaded Hazard Config for {_configs.Count} SpawnTypes");
+                Plugin.Log.LogInfo($"Successfully loaded Hazard Config for {Configs.Count} SpawnTypes");
         }
         catch (Exception ex)
         {
@@ -269,7 +272,7 @@ public static class HazardConfigSettings
         {
             // This will be called by MenuSettings.SaveSettings() to integrate
             // the HazardConfigs into the main settings JSON file
-            Plugin.Log.LogInfo($"Hazard Config settings updated for {_configs.Count} SpawnTypes");
+            Plugin.Log.LogInfo($"Hazard Config settings updated for {Configs.Count} SpawnTypes");
         }
         catch (Exception ex)
         {
@@ -284,7 +287,7 @@ public static class HazardConfigSettings
     {
         try
         {
-            _configs.Clear();
+            Configs.Clear();
             
             foreach (var config in configs)
             {
@@ -308,12 +311,12 @@ public static class HazardConfigSettings
                             values[field.Name] = field.Value;
                         }
                     }
-                    _configs[spawnType] = values;
+                    Configs[spawnType] = values;
                 }
             }
             
             if (Plugin.DebugMenu)
-                Plugin.Log.LogInfo($"Loaded {_configs.Count} hazard config types from XML");
+                Plugin.Log.LogInfo($"Loaded {Configs.Count} hazard config types from XML");
         }
         catch (Exception ex)
         {

@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using ConsoleTools;
 using HazardSpam.Hazards;
+using HazardSpam.Menu.Descriptors;
+using HazardSpam.Menu.Settings;
 using HazardSpam.Networking;
 using HazardSpam.Tests;
+using HazardSpam.Types;
 using NetGameState.Events;
 using NetGameState.Level;
 using NetGameState.LevelProgression;
@@ -138,19 +141,25 @@ public static class ModManager
 
     private static IEnumerator LoadRun()
     {
-        Plugin.Log.LogColor("Waiting to load run..");
+        Plugin.Log.LogColor("Waiting to load run.. 3 seconds");
         yield return new WaitForSeconds(3f);            // ensure all players have loaded their spawner prefabs
 
-        Plugin.Log.LogColor("Loading run");
+        Plugin.Log.LogColor("Creating spawners..");
         HazardManager.CreateSpawnersFromConfigOverNetwork();
         Plugin.Log.LogColor("Spawners created");
+
+        yield return new WaitForSeconds(0.5f);
+        
+        Plugin.Log.LogColor("Applying hazard tweaks..");
+        HazardManager.ApplyTweaksFromConfigOverNetwork();
+        Plugin.Log.LogColor("Hazard tweaks applied");
         
         yield return new WaitForSeconds(3f);
         
         Plugin.Log.LogColor("Loading zone");
         yield return HazardManager.LoadZone(Zone.Shore);
-        
     }
+
 
 // ============================================================================
     //  Callbacks - Segments

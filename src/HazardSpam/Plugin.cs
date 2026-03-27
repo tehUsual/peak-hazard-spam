@@ -7,11 +7,8 @@ using HarmonyLib;
 using HazardSpam.Config;
 using HazardSpam.Hazards;
 using HazardSpam.Menu;
-using HazardSpam.Networking;
-using HazardSpam.Tests;
+using HazardSpam.Patches;
 using NetGameState.Events;
-using NetGameState.Level;
-using NetGameState.LevelProgression;
 using NetGameState.Logging;
 using NetGameState.Patches;
 using NetGameState.Tests;
@@ -64,6 +61,11 @@ public partial class Plugin : BaseUnityPlugin
         
         // === Harmony patch
         var harmony = new Harmony("com.github.tehUsual.HazardSpam");
+        
+        // HazardSpam patches
+        harmony.PatchAll(typeof(SlipperyJellyfishPatches));
+        
+        // NetGameState patches
         harmony.PatchAll(typeof(AirportCheckInPatches));
         harmony.PatchAll(typeof(LoadScenePatches));
         harmony.PatchAll(typeof(MainMenuPatches));
@@ -73,6 +75,7 @@ public partial class Plugin : BaseUnityPlugin
         harmony.PatchAll(typeof(RunManagerPatches));
         harmony.PatchAll(typeof(SteamLobbyHandlerPatches));
         
+        // ConsoleTools patches
         if (Debug)
             harmony.PatchAll(typeof(ConsoleLogListenerPatches));
         

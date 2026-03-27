@@ -128,6 +128,37 @@ public class NetComm : MonoBehaviourPun
     
     
     // ============================================================================
+    //  Hazard tweaks
+    // ============================================================================
+    internal void ApplyTweaksNetwork(HazardTweakNet[] tweaks)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        int[] types = tweaks.Select(t => (int)t.Type).ToArray();
+        string[] fields = tweaks.Select(t => t.Field).ToArray();
+        object[] values = tweaks.Select(t => t.Value).ToArray();
+        
+        Plugin.Log.LogColor($"[Network] Sending 'RPC_ApplyTweaks' for {tweaks.Length} tweaks");
+        photonView.RPC("RPC_ApplyTweaks", RpcTarget.All, types, fields, values);
+    }
+
+    [PunRPC]
+    public void RPC_ApplyTweaks(int[] types, string[] fields, object[] values)
+    {
+        Plugin.Log.LogColor($"[Network] Receiving 'RPC_ApplyTweaks' for {types.Length} tweaks");
+        for (int i = 0; i < types.Length; i++) 
+        {
+            HazardTweakApplicator.ApplyTweak(
+                (HazardType)types[i],
+                fields[i],
+                values[i]
+            );
+        }
+    }
+
+
+    // ============================================================================
     //  Helpers
     // ============================================================================
     

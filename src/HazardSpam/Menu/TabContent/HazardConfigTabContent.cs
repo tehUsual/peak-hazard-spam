@@ -346,7 +346,7 @@ public class HazardConfigTabContent
     /// </summary>
     private object GetValueForSpawnType(SpawnTypeField field, HazardType hazardType)
     {
-        if (HazardConfigSettings._configs.TryGetValue(hazardType, out var typeConfig))
+        if (HazardConfigSettings.Configs.TryGetValue(hazardType, out var typeConfig))
         {
             if (typeConfig.TryGetValue(field.Name, out var value))
             {
@@ -373,12 +373,12 @@ public class HazardConfigTabContent
     /// </summary>
     private void SetValueForSpawnType(string fieldName, HazardType hazardType, object value)
     {
-        if (!HazardConfigSettings._configs.ContainsKey(hazardType))
+        if (!HazardConfigSettings.Configs.ContainsKey(hazardType))
         {
-            HazardConfigSettings._configs[hazardType] = new Dictionary<string, object>();
+            HazardConfigSettings.Configs[hazardType] = new Dictionary<string, object>();
         }
         
-        HazardConfigSettings._configs[hazardType][fieldName] = value;
+        HazardConfigSettings.Configs[hazardType][fieldName] = value;
         HazardConfigSettings.SaveSettings();
     }
     

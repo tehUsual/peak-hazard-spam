@@ -453,7 +453,7 @@ public static class MenuSettings
         try
         {
             if (Plugin.DebugMenu)
-                Plugin.Log.LogInfo($"SaveSettings: Starting save with {_hazardData.Count} hazards and {HazardConfigSettings._configs.Count} configs");
+                Plugin.Log.LogInfo($"SaveSettings: Starting save with {_hazardData.Count} hazards and {HazardConfigSettings.Configs.Count} configs");
             
             // Build XML data structures
             var seenCombinations = new HashSet<(Zone, SubZoneArea, HazardType)>();
@@ -477,7 +477,7 @@ public static class MenuSettings
             
             // Convert hazard configs to XML entries
             var hazardConfigs = new List<XmlSpawnTypeConfig>();
-            foreach (var kvp in HazardConfigSettings._configs)
+            foreach (var kvp in HazardConfigSettings.Configs)
             {
                 hazardConfigs.Add(new XmlSpawnTypeConfig(kvp.Key, kvp.Value));
             }
@@ -546,7 +546,7 @@ public static class MenuSettings
             
             // Store current data count for verification
             int originalHazardCount = _hazardData.Count;
-            int originalConfigCount = HazardConfigSettings._configs.Count;
+            int originalConfigCount = HazardConfigSettings.Configs.Count;
             
             Plugin.Log.LogInfo($"Testing with {originalHazardCount} hazards and {originalConfigCount} configs");
             
@@ -588,14 +588,14 @@ public static class MenuSettings
             
             // Clear existing data
             _hazardData.Clear();
-            HazardConfigSettings._configs.Clear();
+            HazardConfigSettings.Configs.Clear();
             
             // Add test hazard data
             AddHazard(Zone.Shore, SubZoneArea.Plateau, HazardType.Jelly, 5);
             AddHazard(Zone.Tropics, SubZoneArea.Wall, HazardType.PoisonIvy, 3);
             
             // Add test hazard config data
-            HazardConfigSettings._configs[HazardType.Jelly] = new Dictionary<string, object>
+            HazardConfigSettings.Configs[HazardType.Jelly] = new Dictionary<string, object>
             {
                 {"damage", 15f},
                 {"knockback", 5f}

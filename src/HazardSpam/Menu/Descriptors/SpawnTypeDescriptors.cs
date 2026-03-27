@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using HazardSpam.Hazards;
 using HazardSpam.Types;
 
 namespace HazardSpam.Menu.Descriptors;
@@ -67,6 +68,22 @@ public static class SpawnTypeDescriptors
 {
     private static readonly List<SpawnTypeDescriptor> _descriptors = new()
     {
+        new SpawnTypeDescriptor(HazardType.Jelly, "Jelly", "")
+        {
+            Fields = new List<SpawnTypeField>
+            {
+                new SpawnTypeField(HazardFields.Force, "Force", FieldType.Float,
+                    DefaultHazardTweaks.HS_SlipperyJellyfish_ForceMul * 100,
+                    "Force multiplier", null, null, "%"),
+                new SpawnTypeField(HazardFields.Spin, "SpinForce", FieldType.Float,
+                    DefaultHazardTweaks.HS_SlipperyJellyfish_SpinMul * 100,
+                    "Backflip multiplier (dizzy warning)", null, null, "%"),
+                new SpawnTypeField(HazardFields.Poison, "Poison", FieldType.Float,
+                    DefaultHazardTweaks.SlipperyJellyfish_Poison * 100,
+                    "Poison received on contact", 0, 100, "%"),
+            }
+        },
+        
         new SpawnTypeDescriptor(HazardType.Geyser, "Geyser", "Volcanic geyser that erupts periodically")
         {
             Fields = new List<SpawnTypeField>
@@ -81,18 +98,6 @@ public static class SpawnTypeDescriptors
                     "Knockback force applied to player", 0f, 50f, "N")
             }
         },
-        
-        new SpawnTypeDescriptor(HazardType.Jelly, "Jelly", "Toxic jellyfish that damages on contact")
-        {
-            Fields = new List<SpawnTypeField>
-            {
-                new SpawnTypeField("poison", "Poison", FieldType.Float, 0.15f, 
-                    "Poison received on contact", 1f, 100f, "HP"),
-                new SpawnTypeField("force", "Force", FieldType.Float, 5f, 
-                    "Force applied to the backflip", 0f, 50f, "")
-            }
-        },
-        
         new SpawnTypeDescriptor(HazardType.Dynamite, "Dynamite", "Explosive that detonates on contact")
         {
             Fields = new List<SpawnTypeField>

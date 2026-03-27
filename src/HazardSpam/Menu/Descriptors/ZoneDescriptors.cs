@@ -28,14 +28,15 @@ public static class ZoneDescriptors
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
                 HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
         ),
-        new ZoneDescriptor(
+        // Not yet implemented:
+        /*new ZoneDescriptor(
             Zone.Roots,
             "Roots",
             new[] { SubZoneArea.Plateau, SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
                 HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
-        ),
+        ),*/
         new ZoneDescriptor(
             Zone.Alpine,
             "Alpine",
@@ -60,22 +61,24 @@ public static class ZoneDescriptors
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
                 HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
         ),
-        new ZoneDescriptor(
+        // Not yet implemented:
+        /*new ZoneDescriptor(
             Zone.Kiln,
             "Kiln",
             new[] { SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
                 HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
-        ),
-        new ZoneDescriptor(
+        ),*/
+        // Not yet implemented:
+        /*new ZoneDescriptor(
             Zone.Peak,
             "Peak",
             new[] { SubZoneArea.Plateau },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
                 HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
-        )
+        )*/
     };
     
     /// <summary>

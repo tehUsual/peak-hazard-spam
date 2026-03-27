@@ -107,7 +107,7 @@ public static class HazardManager
         if (spawnerNetIds.Count > 0)
             NetComm.Instance.CreateMultipleSpawnersNetwork(spawnerNetIds.ToArray());
     }
-
+    
     internal static void CreateSpawner(Zone zone, SubZoneArea area, HazardType hazardType, int viewID)
     {
         if (!HazardTemplateManager.PropPrefabs.TryGetValue(hazardType, out var propSpawnerPrefab))
@@ -174,6 +174,32 @@ public static class HazardManager
         
         // Add to registry
         ActiveSpawners[(zone, area, hazardType)] = spawnerGo;
+    }
+
+    internal static void ApplyTweaksFromConfigOverNetwork()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+        
+        List<HazardTweakNet> tweaks = [];
+        
+        foreach (var outer in HazardConfigSettings.Configs)
+        {
+            HazardType type = outer.Key;
+            Dictionary<string, object> innerDict = outer.Value;
+            foreach (var inner in innerDict)
+            {
+                string key = inner.Key;
+                object value = inner.Value;
+
+                tweaks.Add(new HazardTweakNet(type, key, value));
+            }
+        }
+        
+        Plugin.Log.LogColor($"Generated {tweaks.Count} tweaks");
+
+        if (tweaks.Count > 0)
+            NetComm.Instance.ApplyTweaksNetwork(tweaks.ToArray());
     }
 
     internal static void UnloadZone(Zone zoneToUnload)
