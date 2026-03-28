@@ -1,5 +1,6 @@
 using System.Net;
 using ConsoleTools;
+using HazardSpam.Menu.Descriptors;
 using HazardSpam.Types;
 
 namespace HazardSpam.Hazards;
@@ -79,6 +80,9 @@ public static class HazardTweakApplicator
                         break;
                     case TweakField.Range:
                         HazardTweaks.PoisonSporeRange = (float)value;
+                        break;
+                    case TweakField.RemoveAfterSeconds:
+                        HazardTweaks.PoisonSporeRemoveAfterSeconds = (float)value;
                         break;
                     case TweakField.RepeatRate:
                         HazardTweaks.PoisonSporeRepeatRate = (float)value;

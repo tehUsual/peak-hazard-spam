@@ -7,7 +7,7 @@ namespace HazardSpam.Patches;
 [HarmonyPatch(typeof(StatusTrigger))]
 public class StatusTriggerPatches
 {
-    [HarmonyPostfix]
+    [HarmonyPrefix]
     [HarmonyPatch(nameof(StatusTrigger.OnTriggerEnter))]
     private static void Prefix_StatusTrigger_OnTriggerEnter(StatusTrigger __instance)
     {
@@ -17,7 +17,6 @@ public class StatusTriggerPatches
             __instance.cooldown = HazardTweaks.PoisonIvyCooldown;
             __instance.statusAmount = HazardTweaks.PoisonIvyStatusAmount;
             __instance.statusType = HazardTweaks.PoisonIvyStatusType;
-            Plugin.Log.LogColor($"Poison Ivy triggered with status type: {HazardTweaks.PoisonIvyStatusAmount.ToString()}");
         }
     }
 }

@@ -1,10 +1,25 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using HazardSpam.Hazards;
 using HazardSpam.Types;
 
 namespace HazardSpam.Menu.Descriptors;
+
+
+public enum RestrictedAffliction
+{
+    Injury = CharacterAfflictions.STATUSTYPE.Injury,
+    Hunger = CharacterAfflictions.STATUSTYPE.Hunger,
+    Cold = CharacterAfflictions.STATUSTYPE.Cold,
+    Poison = CharacterAfflictions.STATUSTYPE.Poison,
+    Curse = CharacterAfflictions.STATUSTYPE.Curse,
+    Drowsy = CharacterAfflictions.STATUSTYPE.Drowsy,
+    Hot = CharacterAfflictions.STATUSTYPE.Hot,
+    Thorns = CharacterAfflictions.STATUSTYPE.Thorns,
+    Spores = CharacterAfflictions.STATUSTYPE.Spores
+}
+
 
 /// <summary>
 /// Describes a configurable field for a SpawnType
@@ -19,9 +34,12 @@ public class SpawnTypeField
     public float? MinValue { get; set; }
     public float? MaxValue { get; set; }
     public string Unit { get; set; } = string.Empty;
-    
-    public SpawnTypeField(string name, string displayName, FieldType type, object defaultValue, 
-        string description = "", float? minValue = null, float? maxValue = null, string unit = "")
+
+    /// <summary>When <see cref="Type"/> is <see cref="FieldType.Enum"/>, the enum type whose names populate the dropdown; stored value is <c>int</c>.</summary>
+    public Type? EnumType { get; set; }
+
+    public SpawnTypeField(string name, string displayName, FieldType type, object defaultValue,
+        string description = "", float? minValue = null, float? maxValue = null, string unit = "", Type? enumType = null)
     {
         Name = name;
         DisplayName = displayName;
@@ -31,6 +49,7 @@ public class SpawnTypeField
         MinValue = minValue;
         MaxValue = maxValue;
         Unit = unit;
+        EnumType = enumType;
     }
 }
 
@@ -41,7 +60,9 @@ public enum FieldType
 {
     Float,
     Int,
-    Bool
+    Bool,
+    /// <summary>Dropdown of enum member names; persisted and exposed as <c>int</c>.</summary>
+    Enum
 }
 
 /// <summary>
@@ -84,10 +105,10 @@ public static class SpawnTypeDescriptors
                     "Backflip multiplier (dizzy warning)", null, null, "%"),
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.SlipperyJellyfish_StatusAmount * 100,
-                    "Poison received on contact", 0, 100, "%"),
-                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    "Effect amount received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Enum,
                     (int)DefaultHazardTweaks.SlipperyJellyfish_StatusType,
-                    "Poison type received on contact", 0, 11, " Effect"),
+                    "Effect type received on contact", null, null, "", typeof(RestrictedAffliction)),
             }
         },
         
@@ -107,14 +128,12 @@ public static class SpawnTypeDescriptors
                 new SpawnTypeField(TweakField.Range, "Range", FieldType.Float,
                     DefaultHazardTweaks.ExploSpore_Range,
                     "Range of explosion", 0, null, "m"),
-                /*new SpawnTypeField(TweakField.HasStatus, "Has Effect", FieldType.Bool,
-                    DefaultHazardTweaks.ExploSpore_HasStatus),*/
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.ExploSpore_StatusAmount * 100,
-                    "Poison received on contact", 0, 100, "%"),
-                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    "Effect amount received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Enum,
                     (int)DefaultHazardTweaks.ExploSpore_StatusType,
-                    "Poison type received on contact", 0, 11, " Effect"),
+                    "Effect type received on contact", null, null, "", typeof(RestrictedAffliction)),
             }
         },
         
@@ -134,17 +153,18 @@ public static class SpawnTypeDescriptors
                 new SpawnTypeField(TweakField.Range, "Range", FieldType.Float,
                     DefaultHazardTweaks.PoisonSpore_Range,
                     "Range of explosion", 0, null, "m"),
-                /*new SpawnTypeField(TweakField.HasStatus, "Has Effect", FieldType.Bool,
-                    DefaultHazardTweaks.PoisonSpore_HasStatus),*/
+                new SpawnTypeField(TweakField.RemoveAfterSeconds, "Linger duration", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_RemoveAfterSeconds,
+                    "Duration of lingering cloud", 0, null, " sec"),
                 new SpawnTypeField(TweakField.RepeatRate, "Repeat Rate", FieldType.Float,
                     DefaultHazardTweaks.PoisonSpore_RepeatRate,
                     "Rate at which cloud effect repeat", 0, null, " sec"),
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.PoisonSpore_StatusAmount * 100,
-                    "Poison received on contact", 0, 100, "%"),
-                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    "Effect amount received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Enum,
                     (int)DefaultHazardTweaks.PoisonSpore_StatusType,
-                    "Poison type received on contact", 0, 11, " Effect"),
+                    "Effect type received on contact", null, null, "", typeof(RestrictedAffliction)),
             }
         },
         
@@ -160,10 +180,10 @@ public static class SpawnTypeDescriptors
                     "Knockback force applied to player", null, null, ""),
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.Urchin_StatusAmount * 100,
-                    "Poison received on contact", 0, 100, "%"),
-                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    "Effect amount received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Enum,
                     (int)DefaultHazardTweaks.Urchin_StatusType,
-                    "Poison type received on contact", 0, 11, " Effect"),
+                    "Effect type received on contact", null, null, "", typeof(RestrictedAffliction)),
             }
         },
         
@@ -179,10 +199,10 @@ public static class SpawnTypeDescriptors
                     "Knockback force applied to player", null, null, ""),
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.Thorn_StatusAmount * 100,
-                    "Poison received on contact", 0, 100, "%"),
-                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    "Effect amount received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Enum,
                     (int)DefaultHazardTweaks.Thorn_StatusType,
-                    "Poison type received on contact", 0, 11, " Effect"),
+                    "Effect type received on contact", null, null, "", typeof(RestrictedAffliction)),
             }
         },
         
@@ -195,10 +215,10 @@ public static class SpawnTypeDescriptors
                     "Probability of triggering", 0, null, " sec"),
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.PoisonIvy_StatusAmount * 100,
-                    "Poison received on contact", 0, 100, "%"),
-                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    "Effect amount received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Enum,
                     (int)DefaultHazardTweaks.PoisonIvy_StatusType,
-                    "Poison type received on contact", 0, 11, " Effect"),
+                    "Effect type received on contact", null, null, "", typeof(RestrictedAffliction)),
             }
         },
         

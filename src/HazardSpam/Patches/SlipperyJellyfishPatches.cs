@@ -28,14 +28,6 @@ public static class SlipperyJellyfishPatches
     {
         foreach (var code in instructions)
         {
-            // Replace status type
-            if ((code.opcode == OpCodes.Ldc_I4 || code.opcode == OpCodes.Ldc_I4_S) &&
-                (int)code.operand == (int)DefaultHazardTweaks.SlipperyJellyfish_StatusType)
-            {
-                yield return new CodeInstruction(OpCodes.Ldsfld, StatusTypeField);
-                continue;
-            }
-
             // Replace status amount
             if (code.opcode == OpCodes.Ldc_R4 && 
                 Mathf.Approximately((float)code.operand, DefaultHazardTweaks.SlipperyJellyfish_StatusAmount))
@@ -63,9 +55,49 @@ public static class SlipperyJellyfishPatches
                     continue;
                 }
             }
+            
+            // Replace status type
+            if (TryGetInt(code, out int val) &&
+                val == (int)DefaultHazardTweaks.SlipperyJellyfish_StatusType)
+            {
+                yield return new CodeInstruction(OpCodes.Ldsfld, StatusTypeField);
+                continue;
+            }
 
             yield return code;
         }
+    }
+    
+    private static bool TryGetInt(CodeInstruction code, out int value)
+    {
+        switch (code.opcode.Name)
+        {
+            case "ldc.i4.m1": value = -1; return true;
+            case "ldc.i4.0": value = 0; return true;
+            case "ldc.i4.1": value = 1; return true;
+            case "ldc.i4.2": value = 2; return true;
+            case "ldc.i4.3": value = 3; return true;
+            case "ldc.i4.4": value = 4; return true;
+            case "ldc.i4.5": value = 5; return true;
+            case "ldc.i4.6": value = 6; return true;
+            case "ldc.i4.7": value = 7; return true;
+            case "ldc.i4.8": value = 8; return true;
+        }
+
+        if (code.opcode == OpCodes.Ldc_I4)
+        {
+            value = (int)code.operand;
+            return true;
+        }
+
+        if (code.opcode == OpCodes.Ldc_I4_S)
+        {
+            value = (sbyte)code.operand;
+            return true;
+        }
+
+        value = 0;
+        return false;
     }
 
     [HarmonyPrefix]

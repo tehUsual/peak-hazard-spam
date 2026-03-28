@@ -44,13 +44,10 @@ public static class HazardConfigSettings
     /// <summary>
     /// Get a configurable value for a field
     /// </summary>
-    public static T GetValue<T>(HazardType type, string fieldName, T defaultValue = default!)
+    public static T GetValue<T>(string fieldName, T defaultValue = default!)
     {
         // Find the SpawnType that has this field
-        var descriptor = SpawnTypeDescriptors.GetAll()
-            .FirstOrDefault(d =>
-                d.Type == type &&
-                d.Fields.Any(f => f.Name == fieldName));
+        var descriptor = SpawnTypeDescriptors.GetAll().FirstOrDefault(d => d.Fields.Any(f => f.Name == fieldName));
         if (descriptor != null && Configs.TryGetValue(descriptor.Type, out var typeConfig))
         {
             if (typeConfig.TryGetValue(fieldName, out var value))
@@ -304,6 +301,10 @@ public static class HazardConfigSettings
                         else if (field.Type == "single" && float.TryParse(field.Value, out float floatValue))
                         {
                             values[field.Name] = floatValue;
+                        }
+                        else if (field.Type == "boolean" && bool.TryParse(field.Value, out bool boolValue))
+                        {
+                            values[field.Name] = boolValue;
                         }
                         else
                         {

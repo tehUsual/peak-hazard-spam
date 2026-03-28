@@ -6,6 +6,7 @@ namespace HazardSpam.Menu;
 public class MenuHandler
 {
     private MenuCanvas _menuCanvas = null!;
+    private readonly KeyCode _toggleKey = KeyCode.Delete;
 
     public void Initialize()
     {
@@ -41,6 +42,14 @@ public class MenuHandler
             _menuCanvas = null!;
         }
     }
+    
+    public void Update()
+    {
+        if (Input.GetKeyDown(_toggleKey))
+        {
+            Toggle();
+        }
+    }
 
     public void Toggle()
     {
@@ -72,20 +81,7 @@ public class MenuHandler
         if (Plugin.DebugMenu)
             Plugin.Log.LogInfo($"Menu toggled: {(isVisible ? "Closed" : "Open")}");
     }
-
-    public void Close()
-    {
-        bool isVisible = _menuCanvas.Canvas.gameObject.activeSelf;
-        _menuCanvas.SetActive(false);
-        
-        if (isVisible)
-        {
-            MenuSettings.SaveSettings();
-            HazardConfigSettings.SaveSettings();
-            Plugin.Log.LogInfo("Settings saved to file");
-        }
-    }
-
+    
     public void UpdateSidebarTabCount(string biomeName, int totalHazards)
     {
         if (_menuCanvas != null)

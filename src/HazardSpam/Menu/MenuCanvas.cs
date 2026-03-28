@@ -371,7 +371,7 @@ public class MenuCanvas
         var buttonText = textGo.AddComponent<Text>();
         buttonText.font = UIStyle.DefaultFont;
         buttonText.color = UIStyle.Colors.TextDefault;
-        buttonText.text = "Hazard Config";
+        buttonText.text = "Hazard Tweaks";
         buttonText.fontSize = UIStyle.FontSizes.Default;
         buttonText.alignment = TextAnchor.MiddleCenter;
         
@@ -445,11 +445,7 @@ public class MenuCanvas
         // Add content height based on active content
         if (_hazardConfigContent != null && _hazardConfigContent.activeSelf)
         {
-            // Calculate height for hazard config content (two-column layout)
-            var configurableTypes = SpawnTypeDescriptors.GetConfigurableTypes().ToList();
-            totalHeight += 50f; // Header
-            totalHeight += (configurableTypes.Count + 1) / 2 * 220f; // Sections in two columns (ceiling division)
-            totalHeight += 50f; // Reset button
+            totalHeight = HazardConfigTabContent.CalculateTotalScrollHeight();
         }
         else if (_activeTab != null)
         {
