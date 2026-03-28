@@ -924,6 +924,6 @@ public static class MenuSettings
         AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.Jelly, 16);
         
         // Peak biome examples
-        AddHazard(Zone.Peak, SubZoneArea.Plateau, HazardType.Cactus, 12);
+        //AddHazard(Zone.Peak, SubZoneArea.Plateau, HazardType.Cactus, 12);
     }
 }

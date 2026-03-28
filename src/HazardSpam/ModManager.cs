@@ -1,12 +1,7 @@
-using System;
 using System.Collections;
 using ConsoleTools;
 using HazardSpam.Hazards;
-using HazardSpam.Menu.Descriptors;
-using HazardSpam.Menu.Settings;
 using HazardSpam.Networking;
-using HazardSpam.Tests;
-using HazardSpam.Types;
 using NetGameState.Events;
 using NetGameState.Level;
 using NetGameState.LevelProgression;

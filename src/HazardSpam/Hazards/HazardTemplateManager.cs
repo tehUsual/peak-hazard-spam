@@ -14,6 +14,7 @@ public static class HazardTemplateManager
 
     internal static readonly Dictionary<HazardType, PropSpawner> PropPrefabs = [];
     internal static readonly Dictionary<(Zone, SubZoneArea), PropSpawner> PropSpawners = [];
+    internal static PropSpawner_Line? KilnPropSpawnerLine { get; private set; }
 
     internal static readonly Dictionary<Zone, Transform> BiomeSpawnerRoots = [];
 
@@ -22,6 +23,7 @@ public static class HazardTemplateManager
         PropPrefabs.Clear();
         PropSpawners.Clear();
         BiomeSpawnerRoots.Clear();
+        KilnPropSpawnerLine = null;
     }
 
     internal static void Initialize()
@@ -105,6 +107,11 @@ public static class HazardTemplateManager
         LoadPropPrefabs(HazardType.BigThorn, $"{MapObjectPaths.SegTropics}/Thorny/Props_Wall/BigThorns");
         LoadPropPrefabs(HazardType.Beehive, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/Behive");  // typo
         LoadPropPrefabs(HazardType.LavaRiver, $"{MapObjectPaths.SegTropics}/Lava/LavaRivers");
+        // Roots
+        /*LoadPropPrefabs(HazardType.ZombieSpawner, $"{MapObjectPaths.SegRoots}/PlateauProps/Zombie Spawners");   // PropSpawner, PhotonView, TriggerRelay
+        LoadPropPrefabs(HazardType.Spiders, $"{MapObjectPaths.SegRoots}/WallProps/Spiders");   // PropSpawner, PhotonView, TriggerRelay
+        LoadPropPrefabs(HazardType.SporeSpore, $"{MapObjectPaths.SegRoots}/WallProps/Spore Shrooms");   // PropSpawner, PhotonView, TriggerRelay
+        LoadPropPrefabs(HazardType.Beetle, $"{MapObjectPaths.SegRoots}/WallProps/Beetles");   // PropSpawner*/
         // Alpine
         LoadPropPrefabs(HazardType.Geyser, $"{MapObjectPaths.SegAlpine}/GeyserHell/PlateauProps/Geysers");
         LoadPropPrefabs(HazardType.FlashPlant, $"{MapObjectPaths.SegAlpine}/Default/Rocks/IceRockSpawn_L/FlashPlant");
@@ -123,6 +130,9 @@ public static class HazardTemplateManager
         // Tropics
         LoadPropSpawnerForArea(Zone.Tropics, SubZoneArea.Plateau, $"{MapObjectPaths.SegTropics}/Default/Pops_Plat/Bushes");
         LoadPropSpawnerForArea(Zone.Tropics, SubZoneArea.Wall, $"{MapObjectPaths.SegTropics}/Default/Props_Wall/ExploShrooms"); // typo
+        // Roots
+        LoadPropSpawnerForArea(Zone.Roots, SubZoneArea.Plateau, $"{MapObjectPaths.SegRoots}/PlateauProps/ExploShrooms");
+        LoadPropSpawnerForArea(Zone.Roots, SubZoneArea.Wall, $"{MapObjectPaths.SegRoots}/WallProps/ExploShrooms (1)");
         // Alpine
         LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.Plateau, $"{MapObjectPaths.SegAlpine}/GeyserHell/PlateauProps/Geysers");
         LoadPropSpawnerForArea(Zone.Alpine, SubZoneArea.Wall, $"{MapObjectPaths.SegAlpine}/Lava/LavaRivers");
@@ -133,8 +143,10 @@ public static class HazardTemplateManager
         LoadPropSpawnerForArea(Zone.Mesa, SubZoneArea.Wall, $"{MapObjectPaths.SegMesa}/Wall/Props/Cactus_Balls");
         // Caldera
         LoadPropSpawnerForArea(Zone.Caldera, SubZoneArea.Plateau, $"{MapObjectPaths.SegCaldera}/Props/Eggs");
+        
         // Volcano
-        LoadPropSpawnerForArea(Zone.Kiln, SubZoneArea.Wall, $"{MapObjectPaths.SegKiln}/Props/LuggageSpawnerLine");     // TODO: PropSpawner_Line
+        // TODO: Add separate PropSpawner_Line support
+        LoadKilnPropSpawnerLine(Zone.Kiln, SubZoneArea.Wall, $"{MapObjectPaths.SegKiln}/Props/LuggageSpawnerLine");
     }
 
     private static void LoadPropSpawnerForArea(Zone zone, SubZoneArea subZoneArea, string path)
@@ -155,6 +167,26 @@ public static class HazardTemplateManager
         
         PropSpawners[(zone, subZoneArea)] = propSpawner;
         Plugin.Log.LogColorS($"Loaded PropSpawner for '{zone.ToString()}/{subZoneArea.ToString()}'");
+    }
+
+    private static void LoadKilnPropSpawnerLine(Zone zone, SubZoneArea subZoneArea, string path)
+    {
+        var spawnerGo = GameObject.Find(path);
+        if (ReferenceEquals(spawnerGo, null))
+        {
+            Plugin.Log.LogColorW($"Could not find spawner for '{zone.ToString()}/{subZoneArea.ToString()}' at {path}");
+            return;
+        }
+        
+        var propSpawnerLine = spawnerGo.GetComponent<PropSpawner_Line>();
+        if (ReferenceEquals(propSpawnerLine, null))
+        {
+            Plugin.Log.LogColorW($"Could not find prop spawner-line for '{zone.ToString()}/{subZoneArea.ToString()}' at {path}");
+            return;
+        }
+
+        Plugin.Log.LogColorS($"Loaded PropSpawner_Line for '{zone.ToString()}/{subZoneArea.ToString()}'");
+        KilnPropSpawnerLine = propSpawnerLine;
     }
 
     private static void LoadPropPrefabs(HazardType hazardType, string path)

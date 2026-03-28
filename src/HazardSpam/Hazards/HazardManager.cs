@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using ConsoleTools;
 using HazardSpam.Helpers;
 using HazardSpam.Menu.Settings;
@@ -110,6 +111,14 @@ public static class HazardManager
     
     internal static void CreateSpawner(Zone zone, SubZoneArea area, HazardType hazardType, int viewID)
     {
+        // Hack
+        if (zone == Zone.Kiln)
+        {
+            CreateSpawner_Kiln(zone, area, hazardType, viewID);
+            return;
+        }
+
+        // Normal routine
         if (!HazardTemplateManager.PropPrefabs.TryGetValue(hazardType, out var propSpawnerPrefab))
         {
             Plugin.Log.LogColorW($"Could not get prefab for '{hazardType.ToString()}'");
@@ -176,6 +185,82 @@ public static class HazardManager
         ActiveSpawners[(zone, area, hazardType)] = spawnerGo;
     }
 
+    private static void CreateSpawner_Kiln(Zone zone, SubZoneArea area, HazardType hazardType, int viewID)
+    {
+        if (!HazardTemplateManager.PropPrefabs.TryGetValue(hazardType, out var propSpawnerPrefab))
+        {
+            Plugin.Log.LogColorW($"Could not get prefab for '{hazardType.ToString()}'");
+            return;
+        }
+
+        if (ReferenceEquals(HazardTemplateManager.KilnPropSpawnerLine, null))
+        {
+            Plugin.Log.LogColorW($"Could not get prop spawner-line for '{hazardType.ToString()}'");
+            return;
+        }
+        
+        if (!HazardTemplateManager.BiomeSpawnerRoots.TryGetValue(zone, out var root))
+        {
+            Plugin.Log.LogColorW($"Could not get root for '{zone.ToString()}'");
+            return;
+        }
+        
+        if (DoesSpawnerExist(zone, area, hazardType))
+        {
+            Plugin.Log.LogColorW($"Spawner '{Helper.GenSpawnID(zone, area, hazardType)}' already exists.");
+            return;
+        }
+        
+        // Create spawner
+        var spawnerGo = new GameObject(GenSpawnerName(area, hazardType));
+        spawnerGo.transform.SetParent(root.transform, worldPositionStays: false);
+        
+        // Set position
+        spawnerGo.transform.position = HazardTemplateManager.KilnPropSpawnerLine.transform.position;
+        spawnerGo.transform.rotation = HazardTemplateManager.KilnPropSpawnerLine.transform.rotation;
+        spawnerGo.transform.localScale = HazardTemplateManager.KilnPropSpawnerLine.transform.localScale;
+        
+        // Create PhotonView
+        if (viewID != -1)
+        {
+            var pv = spawnerGo.AddComponent<PhotonView>();
+            pv.ViewID = viewID;
+        }
+        
+        // Create PropSpawner_Line
+        var propSpawnerLine = spawnerGo.AddComponent<PropSpawner_Line>();
+        
+        // Configure PropSpawner_line
+        propSpawnerLine.height = HazardTemplateManager.KilnPropSpawnerLine.height + 150;    // +/- 75
+        propSpawnerLine.layerType = HazardTemplateManager.KilnPropSpawnerLine.layerType;
+        propSpawnerLine.nrOfSpawns = 1;
+        propSpawnerLine.rayCastSpawn = HazardTemplateManager.KilnPropSpawnerLine.rayCastSpawn;
+        propSpawnerLine.rayLength = HazardTemplateManager.KilnPropSpawnerLine.rayLength;
+        propSpawnerLine.syncTransforms = false;
+        propSpawnerLine.props = [propSpawnerPrefab.props[0]];
+        
+        // Configure this if needed...
+        propSpawnerLine.modifiers = new List<PropSpawnerMod>(HazardTemplateManager.KilnPropSpawnerLine.modifiers);
+
+        propSpawnerLine.constraints = new List<PropSpawnerConstraint>()
+        {
+            new PSC_SameTypeDistance
+            {
+                minDistance = 5,
+                findAllSpawners = false,
+                axisMultipliers = Vector3.one
+            }
+        };
+
+        propSpawnerLine.postConstraints = new List<PropSpawnerConstraintPost>(HazardTemplateManager.KilnPropSpawnerLine.postConstraints);
+        
+        // Add Trigger Relay
+        var triggerRelay = spawnerGo.AddComponent<TriggerRelay>();
+        
+        // Add to registry
+        ActiveSpawners[(zone, area, hazardType)] = spawnerGo;
+    }
+    
     internal static void ApplyTweaksFromConfigOverNetwork()
     {
         if (!PhotonNetwork.IsMasterClient)
@@ -222,23 +307,49 @@ public static class HazardManager
         foreach (var ((area, type), hazardSettings) in hazards) {
             if (ActiveSpawners.TryGetValue((zoneToLoad, area, type), out var spawnerGo))
             {
-                var propSpawner = spawnerGo.GetComponent<PropSpawner>();
-                if (ReferenceEquals(propSpawner, null))
+                // Volcano hack
+                if (zoneToLoad == Zone.Kiln)
                 {
-                    Plugin.Log.LogColorW($"Could not find prop spawner for {zoneToLoad.ToString()}/{area.ToString()}/{type.ToString()}");
-                    continue;
-                }
-
-                var (positions, rotations) = SpawnerLogic.GenerateSpawnPoints(propSpawner, hazardSettings.Amount);
-                Plugin.Log.LogColor($"Generated {positions.Length} positions out of {hazardSettings.Amount}");
-                if (positions.Length == 0)
-                {
-                    yield return null;
-                    continue;
+                    var propSpawnerLine = spawnerGo.GetComponent<PropSpawner_Line>();
+                    if (ReferenceEquals(propSpawnerLine, null))
+                    {
+                        Plugin.Log.LogColorW($"Could not find prop spawner_line for {zoneToLoad.ToString()}/{area.ToString()}/{type.ToString()}");
+                        continue;
+                    }
+                    
+                    var (positions, rotations) = SpawnerLogic.GenerateSpawnPoints(propSpawnerLine, hazardSettings.Amount);
+                    Plugin.Log.LogColor($"Generated {positions.Length} positions out of {hazardSettings.Amount}");
+                    if (positions.Length == 0)
+                    {
+                        yield return null;
+                        continue;
+                    }
+                    
+                    NetComm.Instance.SpawnHazardsNetwork(zoneToLoad, area, type, positions, rotations);
+                    yield return new WaitForSeconds(0.33f);
                 }
                 
-                NetComm.Instance.SpawnHazardsNetwork(zoneToLoad, area, type, positions, rotations);
-                yield return new WaitForSeconds(0.33f);
+                // Normal routine
+                else
+                {
+                    var propSpawner = spawnerGo.GetComponent<PropSpawner>();
+                    if (ReferenceEquals(propSpawner, null))
+                    {
+                        Plugin.Log.LogColorW($"Could not find prop spawner for {zoneToLoad.ToString()}/{area.ToString()}/{type.ToString()}");
+                        continue;
+                    }
+
+                    var (positions, rotations) = SpawnerLogic.GenerateSpawnPoints(propSpawner, hazardSettings.Amount);
+                    Plugin.Log.LogColor($"Generated {positions.Length} positions out of {hazardSettings.Amount}");
+                    if (positions.Length == 0)
+                    {
+                        yield return null;
+                        continue;
+                    }
+                    
+                    NetComm.Instance.SpawnHazardsNetwork(zoneToLoad, area, type, positions, rotations);
+                    yield return new WaitForSeconds(0.33f);
+                }
             }
             else
             {

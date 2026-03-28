@@ -18,7 +18,7 @@ public static class ZoneDescriptors
             new[] { SubZoneArea.Plateau, SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
         ),
         new ZoneDescriptor(
             Zone.Tropics,
@@ -26,24 +26,23 @@ public static class ZoneDescriptors
             new[] { SubZoneArea.Plateau, SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
         ),
-        // Not yet implemented:
-        /*new ZoneDescriptor(
+        new ZoneDescriptor(
             Zone.Roots,
             "Roots",
             new[] { SubZoneArea.Plateau, SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
-        ),*/
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
+        ),
         new ZoneDescriptor(
             Zone.Alpine,
             "Alpine",
             new[] { SubZoneArea.Plateau, SubZoneArea.Wall, SubZoneArea.WallLeft, SubZoneArea.WallRight },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
         ),
         new ZoneDescriptor(
             Zone.Mesa,
@@ -51,7 +50,7 @@ public static class ZoneDescriptors
             new[] { SubZoneArea.Plateau, SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
         ),
         new ZoneDescriptor(
             Zone.Caldera,
@@ -59,17 +58,16 @@ public static class ZoneDescriptors
             new[] { SubZoneArea.Plateau },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
         ),
-        // Not yet implemented:
-        /*new ZoneDescriptor(
+        new ZoneDescriptor(
             Zone.Kiln,
             "Kiln",
             new[] { SubZoneArea.Wall },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
-        ),*/
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
+        ),
         // Not yet implemented:
         /*new ZoneDescriptor(
             Zone.Peak,
@@ -77,7 +75,7 @@ public static class ZoneDescriptors
             new[] { SubZoneArea.Plateau },
             spawnTypeWhitelist: new[] { HazardType.Urchin, HazardType.Jelly, HazardType.PoisonIvy,
                 HazardType.ExploSpore, HazardType.PoisonSpore, HazardType.Thorn, HazardType.BigThorn, HazardType.Geyser,
-                HazardType.FlashPlant, HazardType.CactusBall, HazardType.Cactus, HazardType.CactusBig }
+                HazardType.FlashPlant, HazardType.Cactus, HazardType.CactusBig }
         )*/
     };
     

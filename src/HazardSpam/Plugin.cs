@@ -27,12 +27,12 @@ public partial class Plugin : BaseUnityPlugin
     
     private MenuHandler _menuHandler = null!;
 
-    internal static readonly bool Debug = true;
-    internal static readonly bool DebugFull = true;
-    internal static readonly bool DebugMenu = false;
+    internal static bool Debug { get; private set; }
+    internal static bool DebugFull { get; private set; }
+    internal static bool DebugMenu { get; private set; }
     
     internal const int HazardSpamViewID = 9989;
-    private const string CompatibleVersion = "1.29.a";
+    private const string CompatibleVersion = "1.54.c";
 
     internal static bool SpawnersInitialized = false;
     
@@ -48,6 +48,9 @@ public partial class Plugin : BaseUnityPlugin
         
         // === Config
         ConfigHandler.Init(Config);
+        Debug = ConfigHandler.Debug.Value;
+        DebugFull = ConfigHandler.DebugVerbose.Value;
+        DebugMenu = ConfigHandler.DebugMenu.Value;
         
         // === Configure console
         if (Debug)
