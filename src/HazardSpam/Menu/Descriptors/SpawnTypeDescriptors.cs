@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using HazardSpam.Hazards;
 using HazardSpam.Types;
 
@@ -72,72 +73,135 @@ public static class SpawnTypeDescriptors
         {
             Fields = new List<SpawnTypeField>
             {
-                new SpawnTypeField(HazardFields.Force, "Force", FieldType.Float,
+                new SpawnTypeField(TweakField.TriggerChance, "Trigger Chance", FieldType.Float,
+                    DefaultHazardTweaks.HS_SlipperyJellyfish_TriggerChance * 100,
+                    "Probability of triggering", 0, 100, "%"),
+                new SpawnTypeField(TweakField.Force, "Force", FieldType.Float,
                     DefaultHazardTweaks.HS_SlipperyJellyfish_ForceMul * 100,
                     "Force multiplier", null, null, "%"),
-                new SpawnTypeField(HazardFields.Spin, "SpinForce", FieldType.Float,
+                new SpawnTypeField(TweakField.Spin, "SpinForce", FieldType.Float,
                     DefaultHazardTweaks.HS_SlipperyJellyfish_SpinMul * 100,
                     "Backflip multiplier (dizzy warning)", null, null, "%"),
-                new SpawnTypeField(HazardFields.Poison, "Poison", FieldType.Float,
-                    DefaultHazardTweaks.SlipperyJellyfish_Poison * 100,
+                new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
+                    DefaultHazardTweaks.SlipperyJellyfish_StatusAmount * 100,
                     "Poison received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    (int)DefaultHazardTweaks.SlipperyJellyfish_StatusType,
+                    "Poison type received on contact", 0, 11, " Effect"),
             }
         },
         
-        new SpawnTypeDescriptor(HazardType.Geyser, "Geyser", "Volcanic geyser that erupts periodically")
+        new SpawnTypeDescriptor(HazardType.ExploSpore, "Explo Spore", "")
         {
             Fields = new List<SpawnTypeField>
             {
-                new SpawnTypeField("triggerChance", "Trigger Chance", FieldType.Float, 0.3f, 
-                    "Probability of geyser triggering (0.0-1.0)", 0f, 1f, "%"),
-                new SpawnTypeField("range", "Range", FieldType.Float, 5f, 
-                    "Explosion radius in meters", 1f, 20f, "m"),
-                new SpawnTypeField("damage", "Damage", FieldType.Float, 25f, 
-                    "Damage dealt to player", 1f, 100f, "HP"),
-                new SpawnTypeField("knockback", "Knockback", FieldType.Float, 8f, 
-                    "Knockback force applied to player", 0f, 50f, "N")
-            }
-        },
-        new SpawnTypeDescriptor(HazardType.Dynamite, "Dynamite", "Explosive that detonates on contact")
-        {
-            Fields = new List<SpawnTypeField>
-            {
-                new SpawnTypeField("damage", "Damage", FieldType.Float, 40f, 
-                    "Damage dealt to player", 1f, 200f, "HP"),
-                new SpawnTypeField("range", "Explosion Range", FieldType.Float, 8f, 
-                    "Explosion radius in meters", 1f, 30f, "m"),
-                new SpawnTypeField("knockback", "Knockback", FieldType.Float, 15f, 
-                    "Knockback force applied to player", 0f, 100f, "N"),
-                new SpawnTypeField("fuseTime", "Fuse Time", FieldType.Float, 2f, 
-                    "Time before explosion in seconds", 0.5f, 10f, "s")
-            }
-        },
-        
-        new SpawnTypeDescriptor(HazardType.Cactus, "Cactus", "Spiky plant that damages on contact")
-        {
-            Fields = new List<SpawnTypeField>
-            {
-                new SpawnTypeField("damage", "Damage", FieldType.Float, 10f, 
-                    "Damage dealt to player", 1f, 50f, "HP"),
-                new SpawnTypeField("knockback", "Knockback", FieldType.Float, 3f, 
-                    "Knockback force applied to player", 0f, 25f, "N"),
-                new SpawnTypeField("spikeLength", "Spike Length", FieldType.Float, 1.5f, 
-                    "Length of cactus spikes", 0.5f, 5f, "m")
+                new SpawnTypeField(TweakField.TriggerChance, "Trigger Chance", FieldType.Float,
+                    DefaultHazardTweaks.ExploSpore_TriggerChance * 100,
+                    "Probability of triggering", 0, 100, "%"),
+                new SpawnTypeField(TweakField.FallTime, "Fall time", FieldType.Float,
+                    DefaultHazardTweaks.ExploSpore_FallTime,
+                    "Time player falls over", 0, null, " sec"),
+                new SpawnTypeField(TweakField.Knockback, "Knockback", FieldType.Float,
+                    DefaultHazardTweaks.ExploSpore_Knockback,
+                    "Knockback force applied to player", null, null, ""),
+                new SpawnTypeField(TweakField.Range, "Range", FieldType.Float,
+                    DefaultHazardTweaks.ExploSpore_Range,
+                    "Range of explosion", 0, null, "m"),
+                /*new SpawnTypeField(TweakField.HasStatus, "Has Effect", FieldType.Bool,
+                    DefaultHazardTweaks.ExploSpore_HasStatus),*/
+                new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
+                    DefaultHazardTweaks.ExploSpore_StatusAmount * 100,
+                    "Poison received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    (int)DefaultHazardTweaks.ExploSpore_StatusType,
+                    "Poison type received on contact", 0, 11, " Effect"),
             }
         },
         
-        new SpawnTypeDescriptor(HazardType.Urchin, "Urchin", "Sea urchin with sharp spines")
+        new SpawnTypeDescriptor(HazardType.PoisonSpore, "Poison Spore", "")
         {
             Fields = new List<SpawnTypeField>
             {
-                new SpawnTypeField("damage", "Damage", FieldType.Float, 8f, 
-                    "Damage dealt to player", 1f, 30f, "HP"),
-                new SpawnTypeField("knockback", "Knockback", FieldType.Float, 2f, 
-                    "Knockback force applied to player", 0f, 15f, "N"),
-                new SpawnTypeField("spineCount", "Spine Count", FieldType.Int, 12, 
-                    "Number of spines on the urchin", 3, 50, "spines")
+                new SpawnTypeField(TweakField.TriggerChance, "Trigger Chance", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_TriggerChance * 100,
+                    "Probability of triggering", 0, 100, "%"),
+                new SpawnTypeField(TweakField.FallTime, "Fall time", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_FallTime,
+                    "Time player falls over", 0, null, " sec"),
+                new SpawnTypeField(TweakField.Knockback, "Knockback", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_Knockback,
+                    "Knockback force applied to player", null, null, ""),
+                new SpawnTypeField(TweakField.Range, "Range", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_Range,
+                    "Range of explosion", 0, null, "m"),
+                /*new SpawnTypeField(TweakField.HasStatus, "Has Effect", FieldType.Bool,
+                    DefaultHazardTweaks.PoisonSpore_HasStatus),*/
+                new SpawnTypeField(TweakField.RepeatRate, "Repeat Rate", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_RepeatRate,
+                    "Rate at which cloud effect repeat", 0, null, " sec"),
+                new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
+                    DefaultHazardTweaks.PoisonSpore_StatusAmount * 100,
+                    "Poison received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    (int)DefaultHazardTweaks.PoisonSpore_StatusType,
+                    "Poison type received on contact", 0, 11, " Effect"),
             }
-        }
+        },
+        
+        new SpawnTypeDescriptor(HazardType.Urchin, "Urchin", "")
+        {
+            Fields = new List<SpawnTypeField>
+            {
+                new SpawnTypeField(TweakField.Cooldown, "Cooldown", FieldType.Float,
+                    DefaultHazardTweaks.Urchin_Cooldown,
+                    "Probability of triggering", 0, null, " sec"),
+                new SpawnTypeField(TweakField.Knockback, "Knockback", FieldType.Float,
+                    DefaultHazardTweaks.Urchin_Knockback,
+                    "Knockback force applied to player", null, null, ""),
+                new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
+                    DefaultHazardTweaks.Urchin_StatusAmount * 100,
+                    "Poison received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    (int)DefaultHazardTweaks.Urchin_StatusType,
+                    "Poison type received on contact", 0, 11, " Effect"),
+            }
+        },
+        
+        new SpawnTypeDescriptor(HazardType.Thorn, "Thorns", "")
+        {
+            Fields = new List<SpawnTypeField>
+            {
+                new SpawnTypeField(TweakField.Cooldown, "Cooldown", FieldType.Float,
+                    DefaultHazardTweaks.Thorn_Cooldown,
+                    "Probability of triggering", 0, null, " sec"),
+                new SpawnTypeField(TweakField.Knockback, "Knockback", FieldType.Float,
+                    DefaultHazardTweaks.Thorn_Knockback,
+                    "Knockback force applied to player", null, null, ""),
+                new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
+                    DefaultHazardTweaks.Thorn_StatusAmount * 100,
+                    "Poison received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    (int)DefaultHazardTweaks.Thorn_StatusType,
+                    "Poison type received on contact", 0, 11, " Effect"),
+            }
+        },
+        
+        new SpawnTypeDescriptor(HazardType.PoisonIvy, "Poison Ivy", "")
+        {
+            Fields = new List<SpawnTypeField>
+            {
+                new SpawnTypeField(TweakField.Cooldown, "Cooldown", FieldType.Float,
+                    DefaultHazardTweaks.PoisonIvy_Cooldown,
+                    "Probability of triggering", 0, null, " sec"),
+                new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
+                    DefaultHazardTweaks.PoisonIvy_StatusAmount * 100,
+                    "Poison received on contact", 0, 100, "%"),
+                new SpawnTypeField(TweakField.StatusType, "Effect Type", FieldType.Int,
+                    (int)DefaultHazardTweaks.PoisonIvy_StatusType,
+                    "Poison type received on contact", 0, 11, " Effect"),
+            }
+        },
+        
     };
     
     /// <summary>

@@ -16,8 +16,10 @@ public static class SlipperyJellyfishPatches
     private static readonly FieldInfo SpinMultiplierField =
         AccessTools.Field(typeof(HazardTweaks), nameof(HazardTweaks.SlipperyJellyfishSpinMultiplier));
     // Poison
+    private static readonly FieldInfo StatusTypeField =
+        AccessTools.Field(typeof(HazardTweaks), nameof(HazardTweaks.SlipperyJellyfishStatusType));
     private static readonly FieldInfo PoisonField =
-        AccessTools.Field(typeof(HazardTweaks), nameof(HazardTweaks.SlipperyJellyfishPoison));
+        AccessTools.Field(typeof(HazardTweaks), nameof(HazardTweaks.SlipperyJellyfishStatusAmount));
     
     
     [HarmonyTranspiler]
@@ -26,10 +28,17 @@ public static class SlipperyJellyfishPatches
     {
         foreach (var code in instructions)
         {
-            // Replace poison value
-            ;
+            // Replace status type
+            if ((code.opcode == OpCodes.Ldc_I4 || code.opcode == OpCodes.Ldc_I4_S) &&
+                (int)code.operand == (int)DefaultHazardTweaks.SlipperyJellyfish_StatusType)
+            {
+                yield return new CodeInstruction(OpCodes.Ldsfld, StatusTypeField);
+                continue;
+            }
+
+            // Replace status amount
             if (code.opcode == OpCodes.Ldc_R4 && 
-                Mathf.Approximately((float)code.operand, DefaultHazardTweaks.SlipperyJellyfish_Poison))
+                Mathf.Approximately((float)code.operand, DefaultHazardTweaks.SlipperyJellyfish_StatusAmount))
             {
                 yield return new CodeInstruction(OpCodes.Ldsfld, PoisonField);
                 continue;
@@ -57,5 +66,14 @@ public static class SlipperyJellyfishPatches
 
             yield return code;
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(SlipperyJellyfish.OnTriggerEnter))]
+    private static bool Prefix_SlipperyJellyfish_OnTriggerEnter(SlipperyJellyfish __instance)
+    {
+        if (HazardTweaks.SlipperyJellyfishTriggerChance < Random.value) 
+            return false;   // cancel event
+        return true;    // allow event
     }
 }

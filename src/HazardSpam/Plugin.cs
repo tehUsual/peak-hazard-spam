@@ -63,7 +63,13 @@ public partial class Plugin : BaseUnityPlugin
         var harmony = new Harmony("com.github.tehUsual.HazardSpam");
         
         // HazardSpam patches
+        harmony.PatchAll(typeof(AOEPatches));
+        harmony.PatchAll(typeof(CollisionModifierPatches));
+        harmony.PatchAll(typeof(RemoveAfterSecondsPatches));
         harmony.PatchAll(typeof(SlipperyJellyfishPatches));
+        harmony.PatchAll(typeof(StatusTriggerPatches));
+        harmony.PatchAll(typeof(TimeEventPatches));
+        harmony.PatchAll(typeof(TriggerEventPatches));
         
         // NetGameState patches
         harmony.PatchAll(typeof(AirportCheckInPatches));
