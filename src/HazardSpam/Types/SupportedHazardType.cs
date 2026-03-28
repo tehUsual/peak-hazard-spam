@@ -17,7 +17,7 @@ public enum SupportedHazardType
     Geyser = HazardType.Geyser,
     FlashPlant = HazardType.FlashPlant,
     
-    CactusBall = HazardType.CactusBall,
+    //CactusBall = HazardType.CactusBall,   // no hazard, becomes a snowball on pickup
     Cactus = HazardType.Cactus,
     CactusBig = HazardType.CactusBig,
     //Dynamite = HazardType.Dynamite,

@@ -158,7 +158,7 @@ public static class SpawnTypeDescriptors
                     "Duration of lingering cloud", 0, null, " sec"),
                 new SpawnTypeField(TweakField.RepeatRate, "Repeat Rate", FieldType.Float,
                     DefaultHazardTweaks.PoisonSpore_RepeatRate,
-                    "Rate at which cloud effect repeat", 0, null, " sec"),
+                    "Rate at which cloud effect repeats", 0, null, " sec"),
                 new SpawnTypeField(TweakField.StatusAmount, "Effect amount", FieldType.Float,
                     DefaultHazardTweaks.PoisonSpore_StatusAmount * 100,
                     "Effect amount received on contact", 0, 100, "%"),

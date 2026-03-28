@@ -14,20 +14,20 @@ public enum HazardType
     PoisonSpore,            // works
     Thorn,                  // works
     BigThorn,               // works
-    Beehive,            // fix
+    Beehive,            // needs fixing
     
     // Alpine
     Geyser,                 // works
     FlashPlant,             // works
     
     // Mesa
-    CactusBall,             // works
+    CactusBall,         // no hazard, becomes a snowball on pickup
     Cactus,                 // works
     CactusBig,              // works
-    Dynamite,           // fix
-    Tumbler,            // fix
-    Scorpion,           // fix
+    Dynamite,           // needs fixing
+    Tumbler,            // needs fixing
+    Scorpion,           // needs fixing
     
     // Special
-    LavaRiver           // fix
+    LavaRiver           // needs fixing
 }
