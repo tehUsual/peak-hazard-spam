@@ -16,7 +16,7 @@ public static class SpawnTests
 {
     internal static void Update()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient || !Plugin.Debug)
             return;
         
         // CTRL
@@ -229,5 +229,4 @@ public static class SpawnTests
             }
         }
     }
-
 }

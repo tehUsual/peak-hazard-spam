@@ -899,29 +899,41 @@ public static class MenuSettings
         _hazardData.Clear();
         
         // Shore biome examples
-        AddHazard(Zone.Shore, SubZoneArea.Plateau, HazardType.Dynamite, 15);
-        AddHazard(Zone.Shore, SubZoneArea.Plateau, HazardType.Urchin, 8);
-        AddHazard(Zone.Shore, SubZoneArea.Wall, HazardType.Jelly, 12);
+        AddHazard(Zone.Shore, SubZoneArea.Plateau, HazardType.Urchin, 75);
+        AddHazard(Zone.Shore, SubZoneArea.Plateau, HazardType.Jelly, 500);
+        AddHazard(Zone.Shore, SubZoneArea.Wall, HazardType.Jelly, 1500);
         
         // Tropics biome examples
-        AddHazard(Zone.Tropics, SubZoneArea.Plateau, HazardType.Cactus, 20);
-        AddHazard(Zone.Tropics, SubZoneArea.Wall, HazardType.Urchin, 6);
+        AddHazard(Zone.Tropics, SubZoneArea.Plateau, HazardType.ExploSpore, 1000);
+        AddHazard(Zone.Tropics, SubZoneArea.Plateau, HazardType.Urchin, 50);
+        AddHazard(Zone.Tropics, SubZoneArea.Plateau, HazardType.ExploSpore, 1500);
+        AddHazard(Zone.Tropics, SubZoneArea.Plateau, HazardType.PoisonSpore, 500);
         
         // Alpine biome examples
-        AddHazard(Zone.Alpine, SubZoneArea.Plateau, HazardType.Jelly, 25);
-        AddHazard(Zone.Alpine, SubZoneArea.Wall, HazardType.Dynamite, 10);
-        AddHazard(Zone.Alpine, SubZoneArea.WallLeft, HazardType.Cactus, 15);
-        AddHazard(Zone.Alpine, SubZoneArea.WallRight, HazardType.Urchin, 18);
+        AddHazard(Zone.Alpine, SubZoneArea.Plateau, HazardType.Jelly, 500);
+        AddHazard(Zone.Alpine, SubZoneArea.Wall, HazardType.Jelly, 250);
+        
+        AddHazard(Zone.Alpine, SubZoneArea.WallLeft, HazardType.Jelly, 250);
+        AddHazard(Zone.Alpine, SubZoneArea.WallLeft, HazardType.Geyser, 30);
+        
+        AddHazard(Zone.Alpine, SubZoneArea.WallRight, HazardType.Jelly, 250);
+        AddHazard(Zone.Alpine, SubZoneArea.WallRight, HazardType.Geyser, 30);
         
         // Mesa biome examples
-        AddHazard(Zone.Mesa, SubZoneArea.Plateau, HazardType.Cactus, 30);
-        AddHazard(Zone.Mesa, SubZoneArea.Wall, HazardType.Jelly, 14);
+        AddHazard(Zone.Mesa, SubZoneArea.Plateau, HazardType.CactusBig, 150);
+        AddHazard(Zone.Mesa, SubZoneArea.Plateau, HazardType.FlashPlant, 55);
+        AddHazard(Zone.Mesa, SubZoneArea.Wall, HazardType.Jelly, 900);
         
         // Caldera biome examples
-        AddHazard(Zone.Caldera, SubZoneArea.Plateau, HazardType.Dynamite, 22);
+        AddHazard(Zone.Caldera, SubZoneArea.Plateau, HazardType.Jelly, 1000);
+        AddHazard(Zone.Caldera, SubZoneArea.Plateau, HazardType.ExploSpore, 250);
         
         // Kiln biome examples
-        AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.Jelly, 16);
+        AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.Jelly, 750);
+        AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.ExploSpore, 85);
+        AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.PoisonSpore, 25);
+        AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.Urchin, 15);
+        AddHazard(Zone.Kiln, SubZoneArea.Wall, HazardType.FlashPlant, 15);
         
         // Peak biome examples
         //AddHazard(Zone.Peak, SubZoneArea.Plateau, HazardType.Cactus, 12);

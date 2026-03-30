@@ -232,3 +232,5 @@ Config.Build.user.props.template
 /.idea
 /.config
 *.psd
+assets/
+artifacts*

@@ -32,7 +32,7 @@ public partial class Plugin : BaseUnityPlugin
     internal static bool DebugMenu { get; private set; }
     
     internal const int HazardSpamViewID = 9989;
-    private const string CompatibleVersion = "1.54.c";
+    private const string CompatibleVersion = "1.60.a";
 
     internal static bool SpawnersInitialized = false;
     
@@ -128,7 +128,7 @@ public partial class Plugin : BaseUnityPlugin
             //SpawnTests.Update();
 
             // Utility
-            if (Input.GetKey(KeyCode.LeftAlt))
+            if (Debug && Input.GetKey(KeyCode.LeftAlt))
             {
                 if (GameStateEvents.IsRunActive)
                 {
@@ -152,7 +152,7 @@ public partial class Plugin : BaseUnityPlugin
                     {
                         var go = GameObject.Find("Map/BL_Airport/Fences/Check In desk/AirportGateKiosk");
                         var kiosk = go?.GetComponent<AirportCheckInKiosk>();
-                        kiosk?.LoadIslandMaster(0);    
+                        kiosk?.LoadIslandMaster(0, []);
                     }
                 }
             }

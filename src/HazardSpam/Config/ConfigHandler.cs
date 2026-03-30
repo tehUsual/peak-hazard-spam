@@ -14,8 +14,8 @@ public static class ConfigHandler
 
     internal static void Init(ConfigFile config)
     {
-        Debug = config.Bind("Debugging","debug", true, "Enable debug logging");
-        DebugVerbose = config.Bind("Debugging","verbose", true, "Enable verbose debug logging");
+        Debug = config.Bind("Debugging","debug", false, "Enable debug logging");
+        DebugVerbose = config.Bind("Debugging","verbose", false, "Enable verbose debug logging");
         DebugMenu = config.Bind("Debugging","menu", false, "Enable menu debug logging");
     }
 }
