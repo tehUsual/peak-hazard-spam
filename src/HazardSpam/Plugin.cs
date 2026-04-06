@@ -15,6 +15,7 @@ using NetGameState.Tests;
 using NetGameState.Util;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace HazardSpam;
 
@@ -38,6 +39,7 @@ public partial class Plugin : BaseUnityPlugin
     
     // PlayerConnectionLog.AddMessage(string s)
     // PlayerConnectionLog.OnPlayerEnteredRoom(player)
+
     private void Awake()
     {
         Instance = this;
