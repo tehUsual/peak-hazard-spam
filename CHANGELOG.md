@@ -1,4 +1,8 @@
 # Changelog
+**2.0.5**
+Support for 1.60.d  
+Fixed bug where menu would not show up.
+
 **2.0.4**
 Quick support for PEAK version 1.60.a
 
