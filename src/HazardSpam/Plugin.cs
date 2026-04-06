@@ -33,7 +33,7 @@ public partial class Plugin : BaseUnityPlugin
     internal static bool DebugMenu { get; private set; }
     
     internal const int HazardSpamViewID = 9989;
-    private const string CompatibleVersion = "1.60.a";
+    private const string CompatibleVersion = "1.60.d";
 
     internal static bool SpawnersInitialized = false;
     
