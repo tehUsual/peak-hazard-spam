@@ -154,7 +154,7 @@ public partial class Plugin : BaseUnityPlugin
                     {
                         var go = GameObject.Find("Map/BL_Airport/Fences/Check In desk/AirportGateKiosk");
                         var kiosk = go?.GetComponent<AirportCheckInKiosk>();
-                        kiosk?.LoadIslandMaster(0, []);
+                        kiosk?.photonView.RPC("LoadIslandMaster", RpcTarget.MasterClient, 0, Array.Empty<byte>());
                     }
                 }
             }
