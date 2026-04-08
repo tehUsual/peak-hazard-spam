@@ -1,4 +1,7 @@
 # Changelog
+**2.0.6**  
+Fix crash if the mod PEAKERRpcInfo was present. Thanks to *sappykun* for a fix.
+
 **2.0.5**
 Support for 1.60.d  
 Fixed bug where menu would not show up.

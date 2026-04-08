@@ -1,7 +1,7 @@
 {
   "name": "Hazard_Spam",
-  "version_number": "2.0.5",
+  "version_number": "2.0.6",
   "website_url": "https://github.com/tehUsual/peak-hazard-spam",
-  "description": "Mass-spawns hazards, master & client - v2.0.5 - Customize spawns with in-game menu! (key DEL)"
+  "description": "Mass-spawns hazards, master & client - v2.0.6 - Customize spawns with in-game menu! (key DEL)"
   "dependencies": []
 }

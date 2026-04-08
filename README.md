@@ -4,7 +4,7 @@ Mass-spawns hazard for all players.
 *Consider this mod in BETA for now*.
 *Reconnection not yet supported*.
 
-Supports patch **1.60.a**
+Supports patch **1.60.d**
 
 ![showcase](https://imgur.com/kv1WsKE.png)
 
@@ -12,10 +12,9 @@ Supports patch **1.60.a**
 - All players are required to have this mod
 
 # Features
-- Configuration menu
+- In-game menu for configuration
 - Configure hazard type and rate for all biomes
 - Tweak hazard settings (force, damage, duration etc)
-- In-game menu for configuration
 
 # In-Game Menu
 Default key for opening the menu is "DEL".  
