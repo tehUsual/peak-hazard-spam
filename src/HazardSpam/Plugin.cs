@@ -31,6 +31,7 @@ public partial class Plugin : BaseUnityPlugin
     internal static bool Debug { get; private set; }
     internal static bool DebugFull { get; private set; }
     internal static bool DebugMenu { get; private set; }
+    internal static float HazardsNetworkSpawnRate { get; private set; }
     
     internal const int HazardSpamViewID = 9989;
     private const string CompatibleVersion = "1.60.d";
@@ -53,6 +54,7 @@ public partial class Plugin : BaseUnityPlugin
         Debug = ConfigHandler.Debug.Value;
         DebugFull = ConfigHandler.DebugVerbose.Value;
         DebugMenu = ConfigHandler.DebugMenu.Value;
+        HazardsNetworkSpawnRate = ConfigHandler.HazardsNetworkSpawnRate.Value;
         
         // === Configure console
         if (Debug)
