@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleTools;
+using HazardSpam.Config;
 using HazardSpam.Helpers;
 using HazardSpam.Menu.Settings;
 using HazardSpam.Networking;
@@ -326,7 +327,7 @@ public static class HazardManager
                     }
                     
                     NetComm.Instance.SpawnHazardsNetwork(zoneToLoad, area, type, positions, rotations);
-                    yield return new WaitForSeconds(0.33f);
+                    yield return new WaitForSeconds(Plugin.HazardsNetworkSpawnRate);
                 }
                 
                 // Normal routine
@@ -348,7 +349,7 @@ public static class HazardManager
                     }
                     
                     NetComm.Instance.SpawnHazardsNetwork(zoneToLoad, area, type, positions, rotations);
-                    yield return new WaitForSeconds(0.33f);
+                    yield return new WaitForSeconds(Plugin.HazardsNetworkSpawnRate);
                 }
             }
             else
